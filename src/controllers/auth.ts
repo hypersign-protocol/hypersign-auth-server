@@ -9,6 +9,7 @@ import fs from 'fs'
 import regMailTemplate from '../mailTemplates/registration';
 import { MailService } from '../services/mail.service'
 import QRCode from 'qrcode';
+import fetch from 'node-fetch'
 
 
 const TEMP_CREDENTIAL_DIR = path.join(__dirname + "/../" + "temp/")
@@ -104,6 +105,35 @@ const getCredential = (req, res) => {
             // activate this user
             await user.update();
 
+            // 
+            const body = { 
+                subject: vc.credentialSubject.id, 
+                schemaId: vc["@context"][1].hsscheme.split('/get/')[1], 
+                dataHash: "", 
+                appId: "", 
+                issuer: vc.issuer,
+                issueDate: vc.issuanceDate,
+                expDate: vc.expirationDate
+            } 
+
+            console.log(body)
+            // 
+            try{
+                const vc_issue_url = process.env.STUDIO_SERVER_VC_EP
+                console.log(vc_issue_url)
+                const resp = await fetch(vc_issue_url, {
+                    method: 'POST',
+                    body: JSON.stringify(body),
+                    headers: { 'Content-Type': 'application/json' },
+                })
+    
+                const json =  await resp.json()
+                console.log(json)
+                
+            }catch(e){
+                console.log(e)
+            }
+            
             // send vc to download.
             if(fromQR){
                 res.status(200).send({ status: 200, message: vc, error: null })
