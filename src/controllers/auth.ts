@@ -117,22 +117,22 @@ const getCredential = (req, res) => {
             } 
 
             console.log(body)
-            // 
-            try{
-                const vc_issue_url = process.env.STUDIO_SERVER_VC_EP
-                console.log(vc_issue_url)
-                const resp = await fetch(vc_issue_url, {
-                    method: 'POST',
-                    body: JSON.stringify(body),
-                    headers: { 'Content-Type': 'application/json' },
-                })
+            // // I thought that while issuing a new credential , the sp would be able to see them in studio app. but not required for now.
+            // try{
+            //     const vc_issue_url = process.env.STUDIO_SERVER_VC_EP
+            //     console.log(vc_issue_url)
+            //     const resp = await fetch(vc_issue_url, {
+            //         method: 'POST',
+            //         body: JSON.stringify(body),
+            //         headers: { 'Content-Type': 'application/json' },
+            //     })
     
-                const json =  await resp.json()
-                console.log(json)
+            //     const json =  await resp.json()
+            //     console.log(json)
                 
-            }catch(e){
-                console.log(e)
-            }
+            // }catch(e){
+            //     console.log(e)
+            // }
             
             // send vc to download.
             if(fromQR){
