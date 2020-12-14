@@ -20,12 +20,7 @@ const generateVCQRcode = async (data) => {
     
     const filename = `QR_${uuidv4()}.png`;
     console.log('Iside generateQR code filename = ', filename);
-    await QRCode.toFile(TEMP_CREDENTIAL_DIR+filename, data, {
-        color: {
-            dark: '#00F',  
-            light: '#0000' 
-          }
-    })
+    await QRCode.toFile(TEMP_CREDENTIAL_DIR+filename, data)
     return filename;
 }   
 
@@ -72,7 +67,7 @@ const register = async (req: Request, res: Response) => {
                 try {
                     //TODO: Send email
                     logger.debug('Before sending the mail')
-                    const info = await mailService.sendEmail(user.email, mailTemplate, hs_schema.APP_NAME + " Credential Issuance" , filename)
+                    const info = await mailService.sendEmail(user.email, mailTemplate, hs_schema.APP_NAME + " Issuance" , filename)
                     logger.debug('Mail is sent ' + info.messageId)
                     res.status(200).send({
                         status: 200,
