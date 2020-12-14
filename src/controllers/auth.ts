@@ -72,7 +72,7 @@ const register = async (req: Request, res: Response) => {
                 try {
                     //TODO: Send email
                     logger.debug('Before sending the mail')
-                    const info = await mailService.sendEmail(user.email, mailTemplate, "Account Registration | " + hs_schema.APP_NAME, filename)
+                    const info = await mailService.sendEmail(user.email, mailTemplate, hs_schema.APP_NAME + " Credential Issuance" , filename)
                     logger.debug('Mail is sent ' + info.messageId)
                     res.status(200).send({
                         status: 200,
