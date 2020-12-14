@@ -1,14 +1,15 @@
-import { nodeServer, logger, bootstrapConfig } from '../config'
+import { nodeServer, logger, bootstrapConfig, hs_schema } from '../config'
 import fetch from 'node-fetch'
 import path from 'path'
-import { store, retrive } from '../utils/file'
+import { store, retrive } from '../utils/file';
+
 
 const  {keysfilePath, schemafilePath} =  bootstrapConfig;
 
 // Register DID
-const registerDid = async (name: string) => {
+const registerDid = async () => {
     logger.info("Registering did start....")
-    const url = `${nodeServer.baseURl}${nodeServer.didCreateEp}?name=${name}`;
+    const url = `${nodeServer.baseURl}${nodeServer.didCreateEp}?name=${hs_schema.APP_NAME}`;
     // Call create api of core and get keys.json
     const resp = await fetch(url);
     const json = await resp.json();
@@ -28,10 +29,10 @@ const registerSchema = async () => {
     logger.info("Fetched keys = " + JSON.stringify(keys))
     const url = `${nodeServer.baseURl}${nodeServer.schemaCreateEp}`;
     const schemaData = {
-        name: "Superhero.com",
+        name: hs_schema.APP_NAME,
         owner: keys.publicKey.id.split('#')[0],
-        attributes: ["Name", "Email"],
-        description: "Superhero Authentication Credential",
+        attributes: hs_schema.ATTRIBUTES,
+        description: hs_schema.DESCRIPTION,
     };
     let headers = {
         "Content-Type": "application/json",
@@ -53,7 +54,7 @@ const registerSchema = async () => {
 }
 
 export async function bootstrap(){
-    await registerDid("Superhero")
+    await registerDid()
     await registerSchema();
 }
 

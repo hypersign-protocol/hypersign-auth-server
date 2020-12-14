@@ -1,26 +1,36 @@
 import { Request, Response } from 'express';
 import { User } from '../services/user.service';
-import IUser from '../models/IUser'
-import { logger, jwtSecret, jwtExpiryInMilli, mail, port, host } from '../config'
+import IUser from '../models/IUser';
+import { logger, jwtSecret, jwtExpiryInMilli, mail, port, host, hs_schema } from '../config';
 import jwt from 'jsonwebtoken';
-import { retrive, store } from '../utils/file'
-import path from 'path'
-import fs from 'fs'
+import { retrive, store, deleteFile } from '../utils/file';
+import path from 'path';
+import fs from 'fs';
 import regMailTemplate from '../mailTemplates/registration';
-import { MailService } from '../services/mail.service'
+import { MailService } from '../services/mail.service';
 import QRCode from 'qrcode';
-import fetch from 'node-fetch'
+import { v4 as uuidv4 } from 'uuid';
+import {TEMP_CREDENTIAL_DIR} from '../config'
 
-
-const TEMP_CREDENTIAL_DIR = path.join(__dirname + "/../" + "temp/")
+if (!fs.existsSync(TEMP_CREDENTIAL_DIR)) {
+    fs.mkdirSync(TEMP_CREDENTIAL_DIR);
+}
 
 const generateVCQRcode = async (data) => {
-    return await QRCode.toDataURL(data);
+    
+    const filename = `QR_${uuidv4()}.png`;
+    console.log('Iside generateQR code filename = ', filename);
+    await QRCode.toFile(TEMP_CREDENTIAL_DIR+filename, data, {
+        color: {
+            dark: '#00F',  
+            light: '#0000' 
+          }
+    })
+    return filename;
 }   
 
 const register = async (req: Request, res: Response) => {
-    try {
-        console.log(req.body)
+    try {        
         logger.debug(req.body)
         const body: IUser = req.body
         const user = new User({ ...body })
@@ -48,18 +58,21 @@ const register = async (req: Request, res: Response) => {
                 let link = `http://${host}:${port}/api/auth/credential?token=${token}`
                 const mailService = new MailService({ ...mail });
                 let mailTemplate = regMailTemplate;
+                mailTemplate = mailTemplate.replace(/@@APPNAME@@/g, hs_schema.APP_NAME)
                 mailTemplate = mailTemplate.replace('@@RECEIVERNAME@@', user.fname)
                 mailTemplate = mailTemplate.replace('@@LINK@@', link)
 
                 // Send link as QR as well
                 link = `${link}&fromQR=true`;
-                const QRUrl = await generateVCQRcode(link);
-                mailTemplate = mailTemplate.replace("@@QRURL@@", QRUrl);
+                const filename = await generateVCQRcode(link);
+                console.log('After generate QR filename =', filename);
+                // mailTemplate = mailTemplate.replace("@@QRURL@@", QRUrl);
+                // console.log(QRUrl)
 
                 try {
                     //TODO: Send email
                     logger.debug('Before sending the mail')
-                    const info = await mailService.sendEmail(user.email, mailTemplate, "Account Registration | Hypersign Studio")
+                    const info = await mailService.sendEmail(user.email, mailTemplate, "Account Registration | " + hs_schema.APP_NAME, filename)
                     logger.debug('Mail is sent ' + info.messageId)
                     res.status(200).send({
                         status: 200,
@@ -93,14 +106,8 @@ const getCredential = (req, res) => {
             if (!userindbstr) throw new Error(`User ${user.email} invalid`)
             const vc = await user.generateCredential();
 
-            // create temporary dir
-            const vcDir = TEMP_CREDENTIAL_DIR
-            if (!fs.existsSync(vcDir)) {
-                fs.mkdirSync(vcDir);
-            }
-
             // create 
-            const filePath = path.join(vcDir + vc['id'] + ".json");
+            const filePath = path.join(TEMP_CREDENTIAL_DIR + vc['id'] + ".json");
             await store(vc, filePath);
             // activate this user
             await user.update();

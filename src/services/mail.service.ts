@@ -3,6 +3,8 @@
 // https://nodemailer.com/about/
 
 import nodemailer from 'nodemailer';
+import  {deleteFile} from '../utils/file';
+import {TEMP_CREDENTIAL_DIR} from '../config'
 // Technically this is not mail service, but mail client. 
 export class MailService {
     host: string;
@@ -29,14 +31,17 @@ export class MailService {
         });
     }
 
-    async sendEmail(to: string, message: string, subject: string){
+    async sendEmail(to: string, message: string, subject: string, filename: string){
+        const path = TEMP_CREDENTIAL_DIR + filename;
+        var  attachments = [{ filename, path, contentType: 'application/png' }];
         const info = await this.transporter.sendMail({
             from: `${this.name} <${this.user}>`,
             to,
             subject,
-            html: message // in plain text
-            // html: "<b>Hello world From hypermine!</b>", // html body
+            attachments, 
+            html: message
         });
+        deleteFile(path);
         return info;
     }
 }
