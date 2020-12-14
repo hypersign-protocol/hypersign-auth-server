@@ -1,20 +1,14 @@
 import { Request, Response } from 'express';
 import { User } from '../services/user.service';
 import IUser from '../models/IUser';
-import { logger, jwtSecret, jwtExpiryInMilli, mail, port, host, hs_schema } from '../config';
+import { logger, jwtSecret, jwtExpiryInMilli, mail, hs_schema, hostnameurl } from '../config';
 import jwt from 'jsonwebtoken';
-import { retrive, store, deleteFile } from '../utils/file';
-import path from 'path';
 import fs from 'fs';
 import regMailTemplate from '../mailTemplates/registration';
 import { MailService } from '../services/mail.service';
 import QRCode from 'qrcode';
 import { v4 as uuidv4 } from 'uuid';
 import {TEMP_CREDENTIAL_DIR} from '../config'
-
-if (!fs.existsSync(TEMP_CREDENTIAL_DIR)) {
-    fs.mkdirSync(TEMP_CREDENTIAL_DIR);
-}
 
 const generateVCQRcode = async (data) => {
     
@@ -49,13 +43,16 @@ const register = async (req: Request, res: Response) => {
             jwtSecret,
             { expiresIn: jwtExpiryInMilli },
             async (err, token) => {
-                if (err) throw new Error(err)
-                let link = `http://${host}:${port}/api/auth/credential?token=${token}`
+                if (err) throw new Error(err);
+                let link = `${hostnameurl}/api/auth/credential?token=${token}`;
+                
+                console.log(link);
+
                 const mailService = new MailService({ ...mail });
                 let mailTemplate = regMailTemplate;
-                mailTemplate = mailTemplate.replace(/@@APPNAME@@/g, hs_schema.APP_NAME)
-                mailTemplate = mailTemplate.replace('@@RECEIVERNAME@@', user.fname)
-                mailTemplate = mailTemplate.replace('@@LINK@@', link)
+                mailTemplate = mailTemplate.replace(/@@APPNAME@@/g, hs_schema.APP_NAME);
+                mailTemplate = mailTemplate.replace('@@RECEIVERNAME@@', user.fname);
+                mailTemplate = mailTemplate.replace('@@LINK@@', link);
 
                 // Send link as QR as well
                 // link = `${link}&fromQR=true`;

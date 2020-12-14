@@ -23,8 +23,9 @@ const logger = log.createSimpleLogger({
 })
 logger.setLevel(process.env.LOG_LEVEL || 'info')
 
-const port = process.env.PORT || 5000
-const host = process.env.HOST || "192.168.43.43";
+const port = process.env.PORT || 5000;
+const host = process.env.HOST || "localhost";
+const hostnameurl = process.env.HOSTNAMEURL || `http://${host}:${port}`;
 
 const bootstrapConfig = {
     keysfilePath : path.join(__dirname + '/keys.json'),
@@ -84,7 +85,9 @@ const hs_schema = {
 const challengeExpTime = 5 // time at which session challenge will expire (in minutes)
 
 
-const TEMP_CREDENTIAL_DIR = path.join(__dirname + "/../" + "temp/")
+const TEMP_CREDENTIAL_DIR = path.join(__dirname + "/../" + "temp/");
+
+
 
 export  {
     port,
@@ -100,5 +103,6 @@ export  {
     hypersignSDK,
     challengeExpTime,
     hs_schema,
-    TEMP_CREDENTIAL_DIR
+    TEMP_CREDENTIAL_DIR,
+    hostnameurl
 }
