@@ -63,7 +63,7 @@ const register = async (req: Request, res: Response) => {
                 mailTemplate = mailTemplate.replace('@@LINK@@', link)
 
                 // Send link as QR as well
-                link = `${link}&fromQR=true`;
+                // link = `${link}&fromQR=true`;
                 const filename = await generateVCQRcode(link);
                 console.log('After generate QR filename =', filename);
                 // mailTemplate = mailTemplate.replace("@@QRURL@@", QRUrl);
@@ -107,8 +107,8 @@ const getCredential = (req, res) => {
             const vc = await user.generateCredential();
 
             // create 
-            const filePath = path.join(TEMP_CREDENTIAL_DIR + vc['id'] + ".json");
-            await store(vc, filePath);
+            // const filePath = path.join(TEMP_CREDENTIAL_DIR + vc['id'] + ".json");
+            // await store(vc, filePath);
             // activate this user
             await user.update();
 
@@ -142,11 +142,12 @@ const getCredential = (req, res) => {
             // }
             
             // send vc to download.
-            if(fromQR){
-                res.status(200).send({ status: 200, message: vc, error: null })
-            }else{
-                res.download(filePath);
-            }
+            res.status(200).send({ status: 200, message: vc, error: null })
+            // if(fromQR){
+                
+            // // }else{
+            // //     res.download(filePath);
+            // // }
         })
     } catch (e) {
         res.status(500).send({ status: 500, message: null, error: e.message })
