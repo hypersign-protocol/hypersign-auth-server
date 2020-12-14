@@ -24,7 +24,7 @@ const logger = log.createSimpleLogger({
 logger.setLevel(process.env.LOG_LEVEL || 'info')
 
 const port = process.env.PORT || 5000
-const host = process.env.HOST || "localhost";
+const host = process.env.HOST || "192.168.43.43";
 
 const bootstrapConfig = {
     keysfilePath : path.join(__dirname + '/keys.json'),
