@@ -30,7 +30,7 @@ const template =
             display: inline-block;
             font-size: 16px;
             cursor: pointer;
-            width:20%;
+            width:30%;
         }
 
         @media only screen and (max-device-width : 640px) {
@@ -79,7 +79,7 @@ const template =
         </p>
         <p class='colored mobile'>
             Hypersign Auth Credential is being issued to you. 
-            Please click on <a class="button" href="@@DEEPLINKURL@@">Accept Credential</a> button to receieve the @@APPNAME@@ Auth Credential. 
+            Please click on </br> </br><a class="button" href="@@DEEPLINKURL@@">Accept Credential</a></br></br> to receieve the @@APPNAME@@ Auth Credential. 
             You should be able to login into websites that supports
             @@APPNAME@@ login.
         </p>
