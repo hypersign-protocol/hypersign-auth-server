@@ -79,7 +79,7 @@ const template =
         </p>
         <p class='colored mobile'>
             Hypersign Auth Credential is being issued to you. 
-            Please click on this button <a class="button" href="@@DEEPLINKURL@@">Accept Credential</a> to to receieve the @@APPNAME@@ Auth Credential. 
+            Please click on <a class="button" href="@@DEEPLINKURL@@">Accept Credential</a> button to receieve the @@APPNAME@@ Auth Credential. 
             You should be able to login into websites that supports
             @@APPNAME@@ login.
         </p>
