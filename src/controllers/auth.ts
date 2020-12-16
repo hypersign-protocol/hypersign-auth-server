@@ -56,6 +56,11 @@ const register = async (req: Request, res: Response) => {
                 const QRUrl = await generateVCQRcode(link);
                 mailTemplate = mailTemplate.replace("@@QRURL@@", QRUrl);
 
+                // Send link as Deeplink for Mobile auth
+                link = `${link}&fromQR=false`;
+                const deepLinkUrl = 'hypersign:credential?url='+link;
+                mailTemplate = mailTemplate.replace("@@DEEPLINKURL@@", deepLinkUrl);
+
                 try {
                     //TODO: Send email
                     logger.debug('Before sending the mail')
