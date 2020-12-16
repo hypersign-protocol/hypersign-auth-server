@@ -27,7 +27,7 @@ const template =
             padding: 20px;
             text-align: center;
             text-decoration: none;
-            display: inline-block;
+            
             font-size: 16px;
             cursor: pointer;
             width:30%;
