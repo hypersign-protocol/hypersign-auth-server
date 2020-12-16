@@ -23,8 +23,9 @@ const logger = log.createSimpleLogger({
 })
 logger.setLevel(process.env.LOG_LEVEL || 'info')
 
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 5000;
 const host = process.env.HOST || "localhost";
+const hostnameurl = process.env.HOSTNAMEURL || `http://${host}:${port}`;
 
 const bootstrapConfig = {
     keysfilePath : path.join(__dirname + '/keys.json'),
@@ -75,7 +76,18 @@ const hypersignSDK = {
     credential: hsdk.credential(options)
 }
 
+const hs_schema = {
+    APP_NAME: process.env.SCHEMA_NAME || 'Superhero',
+    ATTRIBUTES: process.env.SCEHMA_ATTRIBUTES || ["Name", "Email"],
+    DESCRIPTION: process.env.SCEHMA_DESCRIPTION || 'Superhero Authentication Credential'
+}
+
 const challengeExpTime = 5 // time at which session challenge will expire (in minutes)
+
+
+const TEMP_CREDENTIAL_DIR = path.join(__dirname + "/../" + "temp/");
+
+
 
 export  {
     port,
@@ -89,5 +101,8 @@ export  {
     mail,
     bootstrapConfig,
     hypersignSDK,
-    challengeExpTime
+    challengeExpTime,
+    hs_schema,
+    TEMP_CREDENTIAL_DIR,
+    hostnameurl
 }
