@@ -20,7 +20,9 @@ export default function app() {
     app.use('/api/app', appRoutes)
     app.use('/api/auth', authRoutes)
     app.use('/api/blog', blogRoutes)
+
     app.get('/', (req, res) => { res.sendFile(path.join(__dirname, '/index.html')) })
+    
 
     app.listen(port, () => logger.info(`The server is running on port ${port}`));
 

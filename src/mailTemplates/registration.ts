@@ -27,7 +27,6 @@ const template =
             padding: 20px;
             text-align: center;
             text-decoration: none;
-            
             font-size: 16px;
             cursor: pointer;
             width:30%;
@@ -71,18 +70,13 @@ const template =
                 src="https://pbs.twimg.com/profile_banners/1302473442466226176/1599398616/1500x500"></p>
 
         <p></p>
-        <p class='colored web'>
+        <p class='colored'>
             Hypersign Auth Credential is being issued to you. 
             Please scan the QR code attached with this email to receieve the @@APPNAME@@ Auth Credential. 
             You should be able to login into websites that supports
             @@APPNAME@@ login.
         </p>
-        <p class='colored mobile'>
-            Hypersign Auth Credential is being issued to you. 
-            Please click on </br> </br><a class="button" href="@@DEEPLINKURL@@">Accept Credential</a></br></br> to receieve the @@APPNAME@@ Auth Credential. 
-            You should be able to login into websites that supports
-            @@APPNAME@@ login.
-        </p>
+        <p><a href='@@DEEPLINKURL@@' class="button">Link to click</a></p>
         <p></p>
         <p>Thanks & Regards, <br />Team @@APPNAME@@!</p>
         <p></p>

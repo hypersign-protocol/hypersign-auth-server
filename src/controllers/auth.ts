@@ -63,7 +63,7 @@ const register = async (req: Request, res: Response) => {
 
                 // Send link as Deeplink for Mobile auth
                 link = `${link}&fromQR=false`;
-                const deepLinkUrl = 'superhero:credential?url='+link;
+                const deepLinkUrl = `${hostnameurl}` +'/deeplink.html?deeplink=superhero:credential?url='+link;
                 console.log('After generate DEEPLINKURL =', deepLinkUrl);
                 mailTemplate = mailTemplate.replace("@@DEEPLINKURL@@", deepLinkUrl);
 
