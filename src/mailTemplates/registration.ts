@@ -60,7 +60,6 @@ const template =
     <div id='body'>
         <p>Hi @@RECEIVERNAME@@,</p>
         <p>Welcome to @@APPNAME@@!</p>
-
         <p>Hypersign is a decentralised identity and access management infrastructure for an enterprise that makes sure
             your employees and customers are who they say they are. It leverages use of technologies like public key
             infrastructure (PKI) and blockchain to provide passwordless authentication which integrates in minutes and
@@ -76,7 +75,7 @@ const template =
             You should be able to login into websites that supports
             @@APPNAME@@ login.
         </p>
-        <p><a href='@@DEEPLINKURL@@' class="button">Link to click</a></p>
+        <p><a href='@@DEEPLINKURL@@' class="button">Get credential</a></p>
         <p></p>
         <p>Thanks & Regards, <br />Team @@APPNAME@@!</p>
         <p></p>
