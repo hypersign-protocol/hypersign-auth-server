@@ -1,108 +1,94 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lrsjng.jquery-qrcode/0.18.0/jquery-qrcode.js" integrity="sha512-k07XFsUtr4GlNmqQnexIG4mS58lorW41CpAsr+hvQ0mIJhcglGdTGeSZcnIBRElbdDTO0vqI9X01tzQ1bCrtyQ==" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Hypersign Authenticator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lrsjng.jquery-qrcode/0.18.0/jquery-qrcode.js"
+            integrity="sha512-k07XFsUtr4GlNmqQnexIG4mS58lorW41CpAsr+hvQ0mIJhcglGdTGeSZcnIBRElbdDTO0vqI9X01tzQ1bCrtyQ=="
+            crossorigin="anonymous"></script>
     <style>
-        .mobile {
-            display: none;
+        .button{
+            text-align: center;
         }
-        .web {
-            display:block;
-        }
-        .margin-top {
-            margin-top: 30px;
+        #qrcode{
+            text-align: center;
         }
         a {
-            background-color: #272831;
-            border: none;
-            color: #f1f1f1;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            text-decoration: none;
+            background-color: #272831 !important;
+            border: none !important;
+            color: #f1f1f1 !important;
+            border-radius: 8px !important;
+            padding: 10px !important;
+            text-align: center !important;
+            text-decoration: none !important;
             /* font-size: 16px; */
-            cursor: pointer;
-            width:30%;
-        }
-        .content {
-            margin: 0 auto;
-            text-align: center;
+            cursor: pointer !important;
+            width: 200px;
         }
         a:hover {
-            background-color: #272831;
-            border: none;
+            background-color: #272831 !important;
+            border: none !important;
             color: #babac0 !important;
         }
-        @media only screen and (max-device-width : 640px) {
-
-            /* Styles */
-            .mobile {
-                display: block;
-            }
-            .web {
-                display:none;
-            }
-        }
-
-        @media only screen and (max-device-width: 768px) {
-
-            /* Styles */
-            .mobile {
-                display: block;
-            }
-            .web {
-                display:none;
-            }
-        }
     </style>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
 </head>
 
 <body>
-    <div class="">
-        <div class="header clearfix">
-
+    <nav class="navbar navbar-expand-md navbar-dark mb-3">
+        <div class="container-fluid">
+            <img src="https://hypersign.id/wp-content/uploads/2020/01/Banner_logo2.png" />
         </div>
-        <div class="jumbotron container">
-            <div class="content">
-                <h1><img src="https://hypersign.id/wp-content/uploads/2020/01/Banner_logo2.png"/></h1>
-                <p class="lead">you can either scan or click the button to load credential</p>
-                <p class="lead"><strong>Don't share with anyone.</strong></p>
-                <p><div id="qrcode"></div></p>
-                <p class="button"></p>
+    </nav>
+    <div class="container">
+        <div class="jumbotron">
+            <h1>Auth Credential</h1>
+            <p class="lead">This is your secret auth credential</p>
+            <p>You can either scan the QR or click on the accept button to store it</p>
+            <p class="lead"><strong>Don't share with anyone.</strong></p>
+            <div id="qrcode"></div>
+            <p class="button"></p>
+        </div>
+        <hr>
+        <footer>
+            <div class="row">
+                <div class="col-md-6">
+                    <p>Copyright &copy; 2021 Hypermine .</p>
+                </div>
             </div>
-        </div>
-    
-        <footer class="footer">
-            <p>© 2021 Hypermine, Inc.</p>
         </footer>
-    
     </div>
-</body>
+    <script type="text/javascript">
 
-<script type="text/javascript">
-
-    console.log('QR code using jquery')
-    
-    $(document).ready(function () {
-        const queryString = window.location.search;
-        // console.log('queryString', queryString);
-        const urlParams = new URLSearchParams(queryString);
-        const deeplink = urlParams.get('deeplink')
-        // console.log('deeplink', deeplink);
-        const buttonhtml = `<a  class="btn " href='${deeplink}' target='_blank'>Accept Credenital</a>`;
-        $('.button').html(buttonhtml);
-        $("#qrcode").qrcode({
-            "width": 200,
-            "height": 200,
-            "text": deeplink
+        $(document).ready(function () {
+            const queryString = window.location.search;
+            // console.log('queryString', queryString);
+            const urlParams = new URLSearchParams(queryString);
+            const deeplink = urlParams.get('deeplink')
+            // console.log('deeplink', deeplink);
+            const buttonhtml = `<a  class="btn " href='${deeplink}' target='_blank'>Accept Credenital</a>`;
+            $('.button').html(buttonhtml);
+            $("#qrcode").qrcode({
+                "width": 200,
+                "height": 200,
+                // minimum version: 1..40
+                "minVersion": 1,
+                "label": 'H',
+                "mode":2,
+                "mSize": 0.1,
+                "mPosX": 0.5,
+                "mPosY": 0.5,
+                "radius": 0.5,
+                "text": deeplink
+            });
         });
-    });
-</script>
+    </script>
+</body>
 
 </html>
