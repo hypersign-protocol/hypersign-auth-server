@@ -8,16 +8,16 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/lrsjng.jquery-qrcode/0.18.0/jquery-qrcode.js"
-            integrity="sha512-k07XFsUtr4GlNmqQnexIG4mS58lorW41CpAsr+hvQ0mIJhcglGdTGeSZcnIBRElbdDTO0vqI9X01tzQ1bCrtyQ=="
-            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lrsjng.jquery-qrcode/0.18.0/jquery-qrcode.js" integrity="sha512-k07XFsUtr4GlNmqQnexIG4mS58lorW41CpAsr+hvQ0mIJhcglGdTGeSZcnIBRElbdDTO0vqI9X01tzQ1bCrtyQ==" crossorigin="anonymous"></script>
     <style>
-        .button{
+        .button {
             text-align: center;
         }
-        #qrcode{
+        
+        #qrcode {
             text-align: center;
         }
+        
         a {
             background-color: #272831 !important;
             border: none !important;
@@ -30,6 +30,7 @@
             cursor: pointer !important;
             width: 200px;
         }
+        
         a:hover {
             background-color: #272831 !important;
             border: none !important;
@@ -65,13 +66,15 @@
         </footer>
     </div>
     <script type="text/javascript">
-
-        $(document).ready(function () {
+        $(document).ready(function() {
             const queryString = window.location.search;
             // console.log('queryString', queryString);
-            const urlParams = new URLSearchParams(queryString);
-            const deeplink = urlParams.get('deeplink')
-            // console.log('deeplink', deeplink);
+            let urlParams = new URLSearchParams(queryString);
+            const deeplink = urlParams.get('deeplink');
+
+
+            const qrText = deeplink.split('url=')[1];;
+
             const buttonhtml = `<a  class="btn " href='${deeplink}' target='_blank'>Accept Credenital</a>`;
             $('.button').html(buttonhtml);
             $("#qrcode").qrcode({
@@ -80,12 +83,12 @@
                 // minimum version: 1..40
                 "minVersion": 1,
                 "label": 'H',
-                "mode":2,
+                "mode": 2,
                 "mSize": 0.1,
                 "mPosX": 0.5,
                 "mPosY": 0.5,
                 "radius": 0.5,
-                "text": deeplink
+                "text": qrText
             });
         });
     </script>
