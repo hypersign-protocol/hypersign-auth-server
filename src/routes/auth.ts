@@ -1,37 +1,39 @@
-import { Router, Request, Response } from 'express';
-import authCtrl from '../controllers/auth';
-import verifyAuth from '../middleware/auth'
-import path  from 'path'
-import { retrive } from '../utils/file'
+import { Router } from "express";
 
-const filePath = path.join(__dirname + "/../" + "keys.json")
-const router = Router();
+export = (hypersign) => {
+  const router = Router();
 
-router.post('/register', authCtrl.register)
-
-router.post('/verify', verifyAuth , (req, res) => {
-    res.status(200).send({
-        status: 200,
-        message: { 
-            m: "The token is verified",
-            user: res.locals.data
-        },
-        error: null
-    })
-})
-router.get('/did', async (req, res) => {
-    const keys = JSON.parse(await retrive(filePath))
-    if(!keys){
-        res.status(400).send({ status: 400, message: null, error: "Keys are not present. Kindly bootstrape first"})
+  // Implement /register API:
+  // Analogous to register user but not yet activated
+  router.post("/register", hypersign.register.bind(hypersign), (req, res) => {
+    try {
+      console.log("Register success");
+      // You can store userdata (req.body) but this user is not yet activated since he has not
+      // validated his email.
+      res.status(200).send({ status: 200, message: "A QR code has been sent to emailId you provided. Kindly scan the QR code with Hypersign Identity Wallet to receive Hypersign Auth Credential.", error: null });
+    } catch (e) {
+      res.status(500).send({ status: 500, message: null, error: e.message });
     }
+  });
 
-    res.status(200).send({
-        status: 200,
-        message: keys.publicKey.id.split('#')[0],
-        error: null
-    })
-})
+  // Implement /credential API:
+  // Analogous to activate user
+  router.get("/credential", hypersign.issueCredential.bind(hypersign), (req, res) => {
+      try {
+        console.log("Credential success");
+        // Now you can make this user active
+        res
+          .status(200)
+          .send({
+            status: 200,
+            message: req.body.verifiableCredential,
+            error: null,
+          });
+      } catch (e) {
+        res.status(500).send({ status: 500, message: null, error: e.message });
+      }
+    }
+  );
 
-router.get('/credential', authCtrl.getCredential)
-
-export default router;
+  return router;
+};
