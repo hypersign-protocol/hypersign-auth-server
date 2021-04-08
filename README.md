@@ -8,7 +8,7 @@ The **Hypersign Authentication Server** is privacy preserving software which is 
 
 You can read more about hypersign @ [docs.hypersign.id](https://docs.hypersign.id).
 
-### Preserves your privacy
+## Preserves your privacy
 
 Unlike, other social login (like F\*\*ceb\*\*k :p) it does not even track any user, meaning;
 
