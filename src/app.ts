@@ -29,8 +29,9 @@ app.use(limiter);
 app.use(xss());
 app.use(cors());
 app.use(express.json({ limit: '10kb' }));
+app.use(express.static('public'))
 
-app.get('/', (req, res) =>  res.send("Hello from auth server"))
+
 app.use('/hs/api/v2/', routes.auth(hypersign));
 
 app.listen(PORT, () => console.log('Server is running @ ' + baseUrl));
