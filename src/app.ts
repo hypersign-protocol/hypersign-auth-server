@@ -24,7 +24,7 @@ const limiter = rateLimit({
 const server =  http.createServer(app);
 const hypersign = new HypersignAuth(server);
 
-app.use(helmet());
+// app.use(helmet());
 app.use(limiter);
 app.use(xss());
 app.use(cors());
