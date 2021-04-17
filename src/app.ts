@@ -30,10 +30,6 @@ app.use(xss());
 app.use(cors());
 app.use(express.json({ limit: '10kb' }));
 
-// app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerJsDoc))
-// app.use('/api/v1/investor', routes.investor);
-// app.use('/api/v1/project', routes.project);
-
 app.use('/hs/api/v2/', routes.auth(hypersign));
 
 app.listen(PORT, () => console.log('Server is running @ ' + baseUrl));
