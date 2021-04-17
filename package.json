@@ -7,7 +7,7 @@
         "start": "NODE_ENV=production node dist/app.js",
         "prod": "NODE_ENV=production node dist/api.bundle.js",
         "dev": "NODE_ENV=development nodemon src/app.ts",
-        "build:dev": "rimraf dist && tsc -p .",
+        "build:dev": "rimraf dist && tsc -p . && cp -r public dist",
         "build:prod": "rimraf dist && webpack",
         "lint": "eslint . --ext .ts",
         "test": "echo \"Error: no test specified\" && exit 1"
