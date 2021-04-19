@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { keys } from '../../hypersign.json';
 
 export = (hypersign) => {
   const router = Router();
@@ -34,6 +35,31 @@ export = (hypersign) => {
       }
     }
   );
+
+  router.get('/authdid', (req, res) => {
+    try{
+      if(!keys){
+        res.statusMessage = "Keys is null or empty in hypersign.json file";
+        return res.status(400).end();
+      }
+  
+      if(!keys.publicKey){
+        res.statusMessage = "PublicKey is null or empty in hypersign.json file";
+        return res.status(400).end();
+      }
+  
+      
+      if(!keys.publicKey.id){
+        res.statusMessage = "PublicKey Id is null or empty in hypersign.json file";
+        return res.status(400).end();
+      }
+  
+      res.status(200).send({ status: 200, message: keys.publicKey.id.split("#")[0], error: null })
+    }catch(e){
+      res.statusMessage = e.message
+      res.status(500).end();
+    }
+  })
 
   return router;
 };
