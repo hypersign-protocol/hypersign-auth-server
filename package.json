@@ -4,7 +4,7 @@
     "description": "Server to issue Hypersign Auth Credential. It uses hypersign-auth-js-sdk for this purpose ",
     "main": "app.js",
     "scripts": {
-        "start": "NODE_ENV=production node dist/app.js",
+        "start": "NODE_ENV=production node dist/src/app.js",
         "prod": "NODE_ENV=production node dist/api.bundle.js",
         "dev": "NODE_ENV=development nodemon src/app.ts",
         "build:dev": "rimraf dist && tsc -p . && cp -r public dist",
