@@ -12,7 +12,7 @@ You can read more about hypersign @ [docs.hypersign.id](https://docs.hypersign.i
 
 Unlike, other social login (like F\*ceb\*\*k :p) it does not even track any user, meaning;
 
-> **The hypersign server does not know whether you are buying from Amazon or travelling to Vegas!**
+> **The hypersign server does not know whether you are buying t-shirt from Amazon or travelling to Vegas!**
 
 ## Install and usage
 
