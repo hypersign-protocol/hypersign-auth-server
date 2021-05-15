@@ -32,7 +32,7 @@ class Configuration {
 
   private setup(){
     this.HOST = process.env.HOST ? process.env.HOST : "localhost";
-    this.PORT = process.env.PORT ? process.env.PORT : "4006";
+    this.PORT = process.env.PORT ? process.env.PORT : "3003";
     this.LOG_LEVEL = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : "info";
     this.NODE_ENV = process.env.NODE_ENV ? process.env.NODE_ENV : "development";
     this.dbConnUrl = process.env.DB_URL && process.env.DB_URL != "" ? process.env.DB_URL :  null;
