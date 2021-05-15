@@ -69,7 +69,8 @@ export = (hypersign) => {
   router.post('/newsession', hypersign.newSession.bind(hypersign), (req, res) => {
     try{
       const { qrData } = req.body
-      res.status(200).send(qrData);
+      qrData["challenge"] = qrData["serviceEndpoint"].split("challenge=")[1];
+      res.status(200).send({ status: 200, message: qrData, error: null });
     }catch(e){
       res.statusMessage = e.message
       res.status(500).end();
@@ -81,7 +82,6 @@ export = (hypersign) => {
   router.post('/auth', hypersign.authenticate.bind(hypersign), (req, res) => {
     try {
         const user = req.body.hsUserData;
-        console.log(user)
             // Do something with the user data.
             // The hsUserData contains userdata and authorizationToken
         res.status(200).send({ status: 200, message: user, error: null });
