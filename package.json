@@ -4,13 +4,14 @@
     "description": "Server to issue Hypersign Auth Credential. It uses hypersign-auth-js-sdk for this purpose ",
     "main": "app.js",
     "scripts": {
-        "start": "cp production.env dist && NODE_ENV=production node dist/src/app.js",
-        "prod": "cp production.env dist && NODE_ENV=production node dist/api.bundle.js",
-        "dev": "NODE_ENV=development nodemon src/app.ts",
-        "build:dev": "rimraf dist && tsc -p . && cp -r public dist",
+        "start": "NODE_ENV=production node dist/src/app.js",
+        "prod": "NODE_ENV=production node dist/api.bundle.js",
+        "dev": "NODE_ENV=production nodemon src/app.ts",
+        "build:dev": "rimraf dist && tsc -p . && cp -r public dist && cp production.env dist",
         "build:prod": "rimraf dist && webpack",
         "lint": "eslint . --ext .ts",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "bootstrap": "NODE_ENV=production ts-node src/bootstrapHypersignMaterial.ts"
     },
     "author": "Vishwas Anand Bhushan",
     "license": "MIT",
@@ -20,6 +21,7 @@
         "express": "^4.17.1",
         "express-rate-limit": "^5.2.6",
         "helmet": "^4.4.1",
+        "hs-ssi-sdk": "^5.0.1",
         "hypersign-auth-js-sdk": "^2.0.4",
         "mongoose": "^5.12.3",
         "swagger-ui-express": "^4.1.6",

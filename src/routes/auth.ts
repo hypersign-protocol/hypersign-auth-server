@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { keys } from '../../hypersign.json';
+import  hsJson  from '../../hypersign.json';
 
 export = (hypersign) => {
   const router = Router();
@@ -38,6 +38,7 @@ export = (hypersign) => {
 
   router.get('/authdid', (req, res) => {
     try{
+      const { keys } = hsJson as any;
       if(!keys){
         res.statusMessage = "Keys is null or empty in hypersign.json file";
         return res.status(400).end();
