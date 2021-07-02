@@ -16,42 +16,28 @@ Unlike, other social login (like F\*ceb\*\*k :p) it does not even track any user
 
 ## Install and usage
 
-Note: Make sure you have `hypersign.json` file in your root folder.
+### Install dependencies
 
-Install dependencies
 ```bash
 npm i 
 ```
 
-Development
+### Development
 
 ```bash
+npm run bootstrap # it will generate hypersign.json 
 npm run dev 
 ```
+Note: Create `production.env` 
 
-```
+### Production
+
+
+```bash
+npm run bootstrap # it will generate hypersign.json 
 npm run build:dev
 npm run start  
 ```
+Note: Create `production.env` 
 
-Production
 
-```bash
-npm run build:prod 
-npm run prod #production
-```
-Note: Create `production.env` for production run
-
-### Dockerization
-
-Build docker image
-```
-npm run build:prod
-docker build -t hs-auth-server .  # build an image
-```
-
-Run container
-```
-docker run -p 5000:5000 -d hs-auth-server
-```
-Note: Create `production.env` for production run

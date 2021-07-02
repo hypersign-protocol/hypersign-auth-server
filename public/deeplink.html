@@ -98,7 +98,15 @@
             const buttonhtml = `<a  class="btn " href='${deeplink}' target='_blank'>Accept Credential in Mobile Wallet</a>`;
             const buttonhtmlweb = `<a  class="btn " href='${weblink}' target='_blank'>Accept Credential in Web Wallet</a>`;
             $('.button').html(buttonhtml);
-            $('.button-web').html(buttonhtmlweb);
+            $('.button-web').html(`<a class="btn" href="#">Accept Credential in Web Wallet</a>`);
+            $('.button-web').click(function(){ 
+                    window.open(
+                        weblink,
+                        "popUpWindow",
+                        `height=800,width=400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes`
+                    );
+            });
+
             $("#qrcode").qrcode({
                 "width": 200,
                 "height": 200,
