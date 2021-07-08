@@ -15,17 +15,17 @@ import http from 'http';
 const app = express();
 
 
-// const limiter = rateLimit({
-//     windowMs: 15 * 60 * 1000, // 15 minutes
-//     max: 100, // limit each IP to 100 requests per windowMs
-//     message: 'Too many requests' // message to send
-//   });
+const limiter = rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 minutes
+    max: 20, // limit each IP to 100 requests per windowMs
+    message: 'Too many requests from your ip' // message to send
+  });
 
 const server =  http.createServer(app);
 const hypersign = new HypersignAuth(server);
 
 // app.use(helmet());
-// app.use(limiter);
+app.use(limiter);
 function corsOptionsDelegate (req, callback) {
   let corsOptions;
   if (whitelistedUrls.indexOf(req.header('Origin')) !== -1) {
