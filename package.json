@@ -22,7 +22,7 @@
         "express-rate-limit": "^5.2.6",
         "helmet": "^4.4.1",
         "hs-ssi-sdk": "^5.0.1",
-        "hypersign-auth-js-sdk": "^2.0.5",
+        "hypersign-auth-js-sdk": "^2.0.6",
         "mongoose": "^5.12.3",
         "swagger-ui-express": "^4.1.6",
         "uuid": "^8.3.2",
