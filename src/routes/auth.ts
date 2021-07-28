@@ -11,7 +11,18 @@ export = (hypersign) => {
       console.log("Register success");
       // You can store userdata (req.body) but this user is not yet activated since he has not
       // validated his email.
-      res.status(200).send({ status: 200, message: "A QR code has been sent to emailId you provided. Kindly scan the QR code with Hypersign Identity Wallet to receive Hypersign Auth Credential.", error: null });
+      if(req.body.verifiableCredential){
+        return res
+        .status(200)
+        .send({
+          status: 200,
+          message: req.body.verifiableCredential,
+          error: null,
+        });
+      }
+
+      return res.status(200).send({ status: 200, message: "A QR code has been sent to emailId you provided. Kindly scan the QR code with Hypersign Identity Wallet to receive Hypersign Auth Credential.", error: null });
+
     } catch (e) {
       res.status(500).send({ status: 500, message: null, error: e.message });
     }
