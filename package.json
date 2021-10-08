@@ -20,6 +20,7 @@
         "dotenv": "^8.2.0",
         "express": "^4.17.1",
         "express-rate-limit": "^5.2.6",
+        "express-validator": "^6.12.2",
         "helmet": "^4.4.1",
         "hs-ssi-sdk": "^5.0.1",
         "hypersign-auth-js-sdk": "^2.0.4",
