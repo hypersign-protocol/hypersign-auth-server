@@ -2,17 +2,53 @@ import { Router } from "express";
 import  hsJson  from '../../hypersign.json';
 import {registerSchemaBody}from "../middleware/registerSchema";
 import { validateRequestSchema } from "../middleware/validateRequestSchema";
-export = (hypersign) => {
+
+interface IHypersignAuth{
+
+  init(): Promise<void>;
+
+  authenticate(req, res, next): Promise<any>;
+  refresh(req, res, next): Promise<any>;
+
+  logout(req, res, next): Promise<any>;
+
+  authorize(req, res, next): Promise<any>;
+  register(req, res, next): Promise<any>;
+  issueCredential(req, res, next): Promise<any>;
+  challenge(req, res, next): Promise<any>;
+
+  poll(req, res, next): Promise<any>;
+
+}
+
+
+export = (hypersign: IHypersignAuth) => {
+  console.log(hypersign);
   const router = Router();
 
+  router.get('/test', (req, res)=>{
+    res.send("Hello")
+  } )
   // Implement /register API:
   // Analogous to register user but not yet activated
-  router.post("/register",hypersign.register.bind(hypersign),registerSchemaBody,validateRequestSchema,  (req, res) => {
+   router.post("/register", hypersign.register.bind(hypersign), (req, res) => {
     try {
       console.log("Register success");
+      console.log(req.body)
       // You can store userdata (req.body) but this user is not yet activated since he has not
       // validated his email.
-      res.status(200).send({ status: 200, message: "A QR code has been sent to emailId you provided. Kindly scan the QR code with Hypersign Identity Wallet to receive Hypersign Auth Credential.", error: null });
+      if(req.body.hypersign.data){
+        return res
+        .status(200)
+        .send({
+          status: 200,
+          message: req.body.hypersign.data,
+          error: null,
+        });
+      }
+
+      return res.status(200).send({ status: 200, message: "A QR code has been sent to emailId you provided. Kindly scan the QR code with Hypersign Identity Wallet to receive Hypersign Auth Credential.", error: null });
+
     } catch (e) {
       res.status(500).send({ status: 500, message: null, error: e.message });
     }
@@ -68,7 +104,7 @@ export = (hypersign) => {
   ////////////////////////////
 
   // Generate new challenge or session
-  router.post('/newsession', hypersign.newSession.bind(hypersign), (req, res) => {
+  router.post('/newsession', hypersign.challenge.bind(hypersign), (req, res) => {
     try{
       const { qrData } = req.body
       res.status(200).send(qrData);
