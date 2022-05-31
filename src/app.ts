@@ -1,11 +1,12 @@
 import express  from 'express';
 import authRoutes from './routes/auth';
+import walletRoutes from './routes/wallet';
 import { PORT, baseUrl, whitelistedUrls } from './config';
 import xss from 'xss-clean';
 import cors from 'cors';
 import HypersignAuth from 'hypersign-auth-node-sdk';
 import http from 'http';
-import { createHIDWallet } from 'hypersign-wallet-sdk';
+import HIDWallet from 'hid-hd-wallet';
 
 
 const app = express();
@@ -24,7 +25,7 @@ function corsOptionsDelegate (req, callback) {
 
 
 app.use(xss());
-// app.use(cors(corsOptionsDelegate)); 
+app.use(cors(corsOptionsDelegate)); 
 app.use(express.json({ limit: '10kb' }));
 app.use(express.static('public'))
 
@@ -47,13 +48,22 @@ interface IHypersignAuth{
 
 }
 
-const mnemonic = "retreat seek south invite fall eager engage endorse inquiry sample salad evidence express actor hidden fence anchor crowd two now convince convince park bag"
-createHIDWallet(mnemonic).then(async(offlineSigner) => {
 
-  const hypersign: IHypersignAuth = (new HypersignAuth(server, offlineSigner)) as IHypersignAuth
+const walletOptions = {
+  hidNodeRPCUrl: 'http://ec2-13-233-118-114.ap-south-1.compute.amazonaws.com:26657',
+  hidNodeRestUrl: 'http://ec2-13-233-118-114.ap-south-1.compute.amazonaws.com:1317',
+};
+
+const mnemonic = "retreat seek south invite fall eager engage endorse inquiry sample salad evidence express actor hidden fence anchor crowd two now convince convince park bag"
+const hidWalletInstance = new HIDWallet(walletOptions);
+
+hidWalletInstance.generateWallet({mnemonic}).then(async() => {
+
+  const hypersign: IHypersignAuth = (new HypersignAuth(server, hidWalletInstance.offlineSigner)) as IHypersignAuth
   await hypersign.init();
 
   app.use('/hs/api/v2', authRoutes(hypersign));
+  app.use('/hs/api/v2', walletRoutes(hidWalletInstance));
 })
 .catch(e => {
         console.error(e)
