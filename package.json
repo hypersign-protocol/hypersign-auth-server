@@ -23,7 +23,7 @@
         "express-validator": "^6.12.2",
         "helmet": "^4.4.1",
         "hid-hd-wallet": "git+https://github.com/hypersign-protocol/hid-hd-wallet.git#ssi-integration",
-        "hs-ssi-sdk": "^5.0.1",
+        "hs-ssi-sdk": "git+https://github.com/hypersign-protocol/hid-ssi-js-sdk.git#ssi-integration",
         "hypersign-auth-node-sdk": "git+https://github.com/hypersign-protocol/hypersign-auth-node-sdk.git#ssi-integration",
         "mongoose": "^5.12.3",
         "swagger-ui-express": "^4.1.6",
@@ -43,8 +43,8 @@
         "nodemon": "^1.19.1",
         "rimraf": "^2.6.3",
         "ts-loader": "^8.0.18",
-        "ts-node": "^9.1.1",
-        "typescript": "^4.2.3",
+        "ts-node": "^10.8.0",
+        "typescript": "^4.7.2",
         "webpack": "^5.27.1",
         "webpack-cli": "^4.5.0"
     }
