@@ -17,7 +17,9 @@ class Configuration {
   public dataDIR: string;
   private dbConnUrl: string;
   public whitelistedUrls: any;
-
+  public HIDNODE_RPC_URL: string;
+  public HIDNODE_REST_URL: string;
+  public HID_WALLET_MNEMONIC: string;
   private constructor() {}
 
   public static getInstance(): Configuration {
@@ -39,6 +41,14 @@ class Configuration {
     this.dbConnUrl = process.env.DB_URL && process.env.DB_URL != "" ? process.env.DB_URL :  null;
     this.baseUrl = "http://" + this.HOST + ":" + this.PORT;
     this.whitelistedUrls = process.env.WHITELISTED_CORS ? process.env.WHITELISTED_CORS : ['*'];
+    this.HIDNODE_RPC_URL = process.env.HIDNODE_RPC_URL ? process.env.HIDNODE_RPC_URL : "http://localhost:26657";
+    this.HIDNODE_REST_URL = process.env.HIDNODE_REST_URL ? process.env.HIDNODE_REST_URL : "http://localhost:1317";
+    
+    this.HID_WALLET_MNEMONIC = process.env.HID_WALLET_MNEMONIC  
+
+    if(!this.HID_WALLET_MNEMONIC){
+      throw new Error('HS-AUTH-SERVER: Error: mnemonic must be set in ENV for hid wallet creation')
+    }
 
     this.dataDIR = process.env.DATA_DIR
       ? process.env.DATA_DIR
@@ -114,6 +124,11 @@ const {
   PORT,
   baseUrl,
   logger,
-  whitelistedUrls
+  whitelistedUrls,
+  HIDNODE_RPC_URL,
+  HIDNODE_REST_URL,
+  HID_WALLET_MNEMONIC
 } = Configuration.getInstance();
-export { db, NODE_ENV, HOST, PORT, baseUrl, logger, whitelistedUrls };
+export { db, NODE_ENV, HOST, PORT, baseUrl, logger, whitelistedUrls,  HIDNODE_RPC_URL,
+  HIDNODE_REST_URL,
+  HID_WALLET_MNEMONIC };

@@ -1,7 +1,7 @@
 import express  from 'express';
 import authRoutes from './routes/auth';
 import walletRoutes from './routes/wallet';
-import { PORT, baseUrl, whitelistedUrls } from './config';
+import { PORT, baseUrl, whitelistedUrls, HIDNODE_RPC_URL, HIDNODE_REST_URL, HID_WALLET_MNEMONIC } from './config';
 import xss from 'xss-clean';
 import cors from 'cors';
 import HypersignAuth from 'hypersign-auth-node-sdk';
@@ -48,17 +48,13 @@ interface IHypersignAuth{
 
 }
 
-
 const walletOptions = {
-  hidNodeRPCUrl: 'http://ec2-13-233-118-114.ap-south-1.compute.amazonaws.com:26657',
-  hidNodeRestUrl: 'http://ec2-13-233-118-114.ap-south-1.compute.amazonaws.com:1317',
+  hidNodeRPCUrl: HIDNODE_RPC_URL,
+  hidNodeRestUrl: HIDNODE_REST_URL,
 };
 
-const mnemonic = "retreat seek south invite fall eager engage endorse inquiry sample salad evidence express actor hidden fence anchor crowd two now convince convince park bag"
 const hidWalletInstance = new HIDWallet(walletOptions);
-
-hidWalletInstance.generateWallet({mnemonic}).then(async() => {
-
+hidWalletInstance.generateWallet({mnemonic: HID_WALLET_MNEMONIC}).then(async() => {
   const hypersign: IHypersignAuth = (new HypersignAuth(server, hidWalletInstance.offlineSigner)) as IHypersignAuth
   await hypersign.init();
 
