@@ -16,11 +16,11 @@ export = (hidWalletInstance) => {
           });
       }
 
-      /// TODO sending only enough for users to created DID
+      /// NOTE sending only enough for users to created DID
       const amount = [
         {
           denom: "uhid",
-          amount: "100",
+          amount: "50",
         },
       ];
       console.log({ recipient: receipientWalletAddress, amount })
@@ -29,6 +29,7 @@ export = (hidWalletInstance) => {
         recipient: receipientWalletAddress,
         amount,
       });
+      
       if (result.transactionHash != '') {
         return res
           .status(200)
