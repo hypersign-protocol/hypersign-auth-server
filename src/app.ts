@@ -29,7 +29,7 @@ app.use(cors(corsOptionsDelegate));
 app.use(express.json({ limit: '10kb' }));
 app.use(express.static('public'))
 
-
+// TODO:  this should go into hypersisgn auth sdk
 interface IHypersignAuth{
 
   init(): Promise<void>;

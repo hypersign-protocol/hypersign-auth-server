@@ -74,7 +74,7 @@ class BootStrap{
 
 
     this.hsCryptoMaterial = await this.registerDid();
-    this.authServerName = process.env.AUTH_SERVER_NAME || "Hypersign Auth"
+    this.authServerName = process.env.AUTH_SERVER_NAME || "Hypersign Auth Credential"
 
 
     //// Schema for Auth Server
