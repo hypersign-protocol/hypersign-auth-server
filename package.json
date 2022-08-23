@@ -1,6 +1,6 @@
 {
     "name": "hypersign-auth-server",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "description": "Server to issue Hypersign Auth Credential. It uses hypersign-auth-js-sdk for this purpose ",
     "main": "app.js",
     "scripts": {
