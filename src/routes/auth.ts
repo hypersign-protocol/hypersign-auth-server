@@ -1,12 +1,13 @@
 import { Router } from "express";
 import  hsJson  from '../../hypersign.json';
+import { verifyAccessTokenForThridPartyAuth } from '../middleware/auth';
 
 export = (hypersign) => {
   const router = Router();
 
   // Implement /register API:
   // Analogous to register user but not yet activated
-  router.post("/register", hypersign.register.bind(hypersign), (req, res) => {
+  router.post("/register", verifyAccessTokenForThridPartyAuth, hypersign.register.bind(hypersign), (req, res) => {
     try {
       console.log("Register success");
       // You can store userdata (req.body) but this user is not yet activated since he has not
