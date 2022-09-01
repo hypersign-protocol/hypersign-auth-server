@@ -25,7 +25,7 @@ const server =  http.createServer(app);
 const hypersign = new HypersignAuth(server);
 
 // app.use(helmet());
-app.use(limiter);
+// app.use(limiter);
 function corsOptionsDelegate (req, callback) {
   let corsOptions;
   if (whitelistedUrls.indexOf(req.header('Origin')) !== -1) {
