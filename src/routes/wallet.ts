@@ -20,7 +20,7 @@ export = (hidWalletInstance) => {
       const amount = [
         {
           denom: "uhid",
-          amount: "1000",
+          amount: "100000",
         },
       ];
       console.log({ recipient: receipientWalletAddress, amount })
