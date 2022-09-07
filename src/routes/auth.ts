@@ -21,9 +21,15 @@ interface IHypersignAuth{
 
 }
 
+function addExpirationDateMiddleware(req, res, next){
+  const now = new Date();
+  // valid for 1 year
+  const expirationDate = new Date(now.setFullYear(now.getFullYear() + 1)).toString()
+  req.body.expirationDate = expirationDate
+  next();
+}
 
 export = (hypersign: IHypersignAuth) => {
-  console.log(hypersign);
   const router = Router();
 
   router.get('/test', (req, res)=>{
@@ -31,10 +37,9 @@ export = (hypersign: IHypersignAuth) => {
   } )
   // Implement /register API:
   // Analogous to register user but not yet activated
-   router.post("/register", hypersign.register.bind(hypersign), (req, res) => {
+   router.post("/register", addExpirationDateMiddleware ,hypersign.register.bind(hypersign), (req, res) => {
     try {
       console.log("Register success");
-      console.log(req.body)
       // You can store userdata (req.body) but this user is not yet activated since he has not
       // validated his email.
       if(req.body.hypersign.data){

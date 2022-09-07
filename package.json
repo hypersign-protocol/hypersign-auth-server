@@ -24,7 +24,7 @@
         "helmet": "^4.4.1",
         "hid-hd-wallet": "https://github.com/hypersign-protocol/hid-hd-wallet#ssi-integration",
         "hs-ssi-sdk": "^6.1.0",
-        "hypersign-auth-node-sdk": "^5.1.0",
+        "hypersign-auth-node-sdk": "^6.0.0",
         "mongoose": "^5.12.3",
         "swagger-ui-express": "^4.1.6",
         "uuid": "^8.3.2",
