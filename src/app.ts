@@ -55,6 +55,7 @@ const walletOptions = {
 
 const hidWalletInstance = new HIDWallet(walletOptions);
 hidWalletInstance.generateWallet({mnemonic: HID_WALLET_MNEMONIC}).then(async() => {
+  hidWalletInstance.offlineSigner.getAccounts().then(console.log)
   const hypersign: IHypersignAuth = (new HypersignAuth(server, hidWalletInstance.offlineSigner)) as IHypersignAuth
   await hypersign.init();
 
