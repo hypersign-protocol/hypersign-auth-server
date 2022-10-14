@@ -1,31 +1,27 @@
 import express  from 'express';
-import routes from './routes';
-import swaggerJsDoc = require('./swagger.json');
-import swaggerUi from 'swagger-ui-express';
-import { PORT, baseUrl, logger, db, whitelistedUrls } from './config';
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
+import authRoutes from './routes/auth';
+import walletRoutes from './routes/wallet';
+import { PORT, baseUrl, whitelistedUrls, HIDNODE_RPC_URL, HIDNODE_REST_URL, HID_WALLET_MNEMONIC } from './config';
 import xss from 'xss-clean';
 import cors from 'cors';
-import HypersignAuth from 'hypersign-auth-js-sdk';
+import HypersignAuth from 'hypersign-auth-node-sdk';
 import http from 'http';
-
+import HIDWallet from 'hid-hd-wallet';
 
 
 const app = express();
 
 
-const limiter = rateLimit({
+/*
+const limiter= rateLimit({
     windowMs: 10 * 60 * 1000, // 10 minutes
     max: 20, // limit each IP to 100 requests per windowMs
     message: 'Too many requests from your ip' // message to send
   });
+*/
 
 const server =  http.createServer(app);
-const hypersign = new HypersignAuth(server);
 
-// app.use(helmet());
-// app.use(limiter);
 function corsOptionsDelegate (req, callback) {
   let corsOptions;
   if (whitelistedUrls.indexOf(req.header('Origin')) !== -1) {
@@ -42,7 +38,41 @@ app.use(cors(corsOptionsDelegate));
 app.use(express.json({ limit: '10kb' }));
 app.use(express.static('public'))
 
+// TODO:  this should go into hypersisgn auth sdk
+interface IHypersignAuth{
 
-app.use('/hs/api/v2/', routes.auth(hypersign));
+  init(): Promise<void>;
+
+  authenticate(req, res, next): Promise<any>;
+  refresh(req, res, next): Promise<any>;
+
+  logout(req, res, next): Promise<any>;
+
+  authorize(req, res, next): Promise<any>;
+  register(req, res, next): Promise<any>;
+  issueCredential(req, res, next): Promise<any>;
+  challenge(req, res, next): Promise<any>;
+
+  poll(req, res, next): Promise<any>;
+
+}
+
+const walletOptions = {
+  hidNodeRPCUrl: HIDNODE_RPC_URL,
+  hidNodeRestUrl: HIDNODE_REST_URL,
+};
+
+const hidWalletInstance = new HIDWallet(walletOptions);
+hidWalletInstance.generateWallet({mnemonic: HID_WALLET_MNEMONIC}).then(async() => {
+  hidWalletInstance.offlineSigner.getAccounts().then(console.log)
+  const hypersign: IHypersignAuth = (new HypersignAuth(server, hidWalletInstance.offlineSigner)) as IHypersignAuth
+  await hypersign.init();
+
+  app.use('/hs/api/v2', authRoutes(hypersign));
+  app.use('/hs/api/v2', walletRoutes(hidWalletInstance));
+})
+.catch(e => {
+        console.error(e)
+    })
 
 app.listen(PORT, () => console.log('Server is running @ ' + baseUrl));
