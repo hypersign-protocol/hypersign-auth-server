@@ -130,10 +130,9 @@ const {
   baseUrl,
   logger,
   whitelistedUrls,
-  auth0Tenant
-} = Configuration.getInstance();
-export { db, NODE_ENV, HOST, PORT, baseUrl, logger, whitelistedUrls, auth0Tenant };
+  auth0Tenant,
   HIDNODE_RPC_URL,
   HIDNODE_REST_URL,
   HID_WALLET_MNEMONIC
 } = Configuration.getInstance();
+export { db, NODE_ENV, HOST, PORT, baseUrl, logger, whitelistedUrls, auth0Tenant, HIDNODE_RPC_URL, HIDNODE_REST_URL, HID_WALLET_MNEMONIC}

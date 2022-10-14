@@ -39,8 +39,7 @@ export = (hypersign: IHypersignAuth) => {
   } )
   // Implement /register API:
   // Analogous to register user but not yet activated
-
-  router.post("/register", verifyAccessTokenForThridPartyAuth, hypersign.register.bind(hypersign), (req, res) => {
+  router.post("/register", verifyAccessTokenForThridPartyAuth, addExpirationDateMiddleware, hypersign.register.bind(hypersign), (req, res) => {
     try {
       console.log("Register success");
       // You can store userdata (req.body) but this user is not yet activated since he has not

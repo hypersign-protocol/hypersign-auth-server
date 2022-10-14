@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 
 import { auth0Tenant, logger } from '../config';
+// TODO move this in hypersign auth js node sdk
 export async function verifyAccessTokenForThridPartyAuth(req, res, next){
     logger.info('Inside verifyAccessTokenForThridPartyAuth method')
     const { isThridPartyAuth } = req.body;

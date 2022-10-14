@@ -1,14 +1,13 @@
 {
     "name": "hypersign-auth-server",
-    "version": "4.0.0",
+    "version": "5.0.0",
     "description": "Server to issue Hypersign Auth Credential. It uses hypersign-auth-js-sdk for this purpose ",
     "main": "app.js",
     "scripts": {
         "start": "NODE_ENV=production node dist/src/app.js",
         "prod": "NODE_ENV=production node dist/api.bundle.js",
         "dev": "NODE_ENV=production nodemon src/app.ts",
-        "build:dev": "rimraf dist && tsc -p . && cp -r public dist && cp production.env dist",
-        "build:prod": "rimraf dist && webpack",
+        "build": "rimraf dist && tsc -p . && cp -r public dist && cp production.env dist",
         "lint": "eslint . --ext .ts",
         "test": "echo \"Error: no test specified\" && exit 1",
         "bootstrap": "NODE_ENV=production ts-node src/bootstrapHypersignMaterial.ts"
@@ -22,8 +21,9 @@
         "express-rate-limit": "^5.2.6",
         "express-validator": "^6.12.2",
         "helmet": "^4.4.1",
-        "hs-ssi-sdk": "^5.0.1",
-        "hypersign-auth-node-sdk": "git+https://github.com/hypersign-protocol/hypersign-auth-node-sdk.git#privateDidSupport",
+        "hs-ssi-sdk": "^6.2.0",
+        "hypersign-auth-node-sdk": "^6.1.0",
+        "hid-hd-wallet": "https://github.com/hypersign-protocol/hid-hd-wallet#ssi-integration",
         "mongoose": "^5.12.3",
         "swagger-ui-express": "^4.1.6",
         "uuid": "^8.3.2",
