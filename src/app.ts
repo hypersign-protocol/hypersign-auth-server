@@ -1,29 +1,78 @@
-import express, { Application, Request, Response } from 'express';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
-import { port, logger } from './config';
+import express  from 'express';
 import authRoutes from './routes/auth';
-import blogRoutes from './routes/blog';
-import appRoutes from './routes/app';
-import path from 'path'
-
-export default function app() {
-    const app: Application = express();
-    app.use(express.json());
-    app.use(cors());
-    app.use(cookieParser());
-    app.use(bodyParser.json());
-    app.use(express.static('public'));
+import walletRoutes from './routes/wallet';
+import { PORT, baseUrl, whitelistedUrls, HIDNODE_RPC_URL, HIDNODE_REST_URL, HID_WALLET_MNEMONIC } from './config';
+import xss from 'xss-clean';
+import cors from 'cors';
+import HypersignAuth from 'hypersign-auth-node-sdk';
+import http from 'http';
+import HIDWallet from 'hid-hd-wallet';
 
 
-    app.use('/api/app', appRoutes)
-    app.use('/api/auth', authRoutes)
-    app.use('/api/blog', blogRoutes)
+const app = express();
 
-    app.get('/', (req, res) => { res.sendFile(path.join(__dirname, '/index.html')) })
-    
 
-    app.listen(port, () => logger.info(`The server is running on port ${port}`));
+/*
+const limiter= rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 minutes
+    max: 20, // limit each IP to 100 requests per windowMs
+    message: 'Too many requests from your ip' // message to send
+  });
+*/
+
+const server =  http.createServer(app);
+
+function corsOptionsDelegate (req, callback) {
+  let corsOptions;
+  if (whitelistedUrls.indexOf(req.header('Origin')) !== -1) {
+    corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+  } else {
+    corsOptions = { origin: false } // disable CORS for this request
+  }
+  callback(null, corsOptions) // callback expects two parameters: error and options
+}
+
+
+app.use(xss());
+app.use(cors(corsOptionsDelegate)); 
+app.use(express.json({ limit: '10kb' }));
+app.use(express.static('public'))
+
+// TODO:  this should go into hypersisgn auth sdk
+interface IHypersignAuth{
+
+  init(): Promise<void>;
+
+  authenticate(req, res, next): Promise<any>;
+  refresh(req, res, next): Promise<any>;
+
+  logout(req, res, next): Promise<any>;
+
+  authorize(req, res, next): Promise<any>;
+  register(req, res, next): Promise<any>;
+  issueCredential(req, res, next): Promise<any>;
+  challenge(req, res, next): Promise<any>;
+
+  poll(req, res, next): Promise<any>;
 
 }
+
+const walletOptions = {
+  hidNodeRPCUrl: HIDNODE_RPC_URL,
+  hidNodeRestUrl: HIDNODE_REST_URL,
+};
+
+const hidWalletInstance = new HIDWallet(walletOptions);
+hidWalletInstance.generateWallet({mnemonic: HID_WALLET_MNEMONIC}).then(async() => {
+  hidWalletInstance.offlineSigner.getAccounts().then(console.log)
+  const hypersign: IHypersignAuth = (new HypersignAuth(server, hidWalletInstance.offlineSigner)) as IHypersignAuth
+  await hypersign.init();
+
+  app.use('/hs/api/v2', authRoutes(hypersign));
+  app.use('/hs/api/v2', walletRoutes(hidWalletInstance));
+})
+.catch(e => {
+        console.error(e)
+    })
+
+app.listen(PORT, () => console.log('Server is running @ ' + baseUrl));

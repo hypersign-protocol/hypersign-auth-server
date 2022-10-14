@@ -1,108 +1,138 @@
-import env from 'dotenv'
-import sqlite from 'sqlite3';
-import path from 'path';
-import fs from 'fs'
-import hsdk from 'lds-sdk'
+import dotenv from "dotenv";
+import path from "path";
+import winston from "winston";
+import fs from "fs";
+import { homedir } from "os";
+import mongoose from 'mongoose';
 
-const log = require('simple-node-logger');
+class Configuration {
+  private static instace: Configuration;
+  public db: any;
+  public NODE_ENV: string;
+  public HOST: string;
+  public PORT: string;
+  public baseUrl: string;
+  public logger: winston.Logger;
+  private LOG_LEVEL: string;
+  public dataDIR: string;
+  private dbConnUrl: string;
+  public whitelistedUrls: any;
+  public auth0Tenant: string;
 
+  public HIDNODE_RPC_URL: string;
+  public HIDNODE_REST_URL: string;
+  public HID_WALLET_MNEMONIC: string;
+  
+  private constructor() {}
 
-env.config();
-
-const log_dir = path.resolve(__dirname,'../log')
-const db_dir = path.resolve(__dirname,'../db')
-
-if(!fs.existsSync(log_dir)) fs.mkdirSync(log_dir)
-if(!fs.existsSync(db_dir)) fs.mkdirSync(db_dir)
-
-// LOGGING
-const log_path = path.resolve(__dirname, process.env.LOG_FILEPATH || 'ssi-infra.log')
-const logger = log.createSimpleLogger({
-    logFilePath: log_path,
-    timestampFormat: process.env.LOG_TIMESTAMP_FORMAT || 'YYYY-MM-DD HH:mm:ss.SSS'
-})
-logger.setLevel(process.env.LOG_LEVEL || 'info')
-
-const port = process.env.PORT || 5000;
-const host = process.env.HOST || "localhost";
-const hostnameurl = process.env.HOSTNAMEURL || `http://${host}:${port}`;
-
-const bootstrapConfig = {
-    keysfilePath : path.join(__dirname + '/keys.json'),
-    schemafilePath : path.join(__dirname + '/schema.json')
-}
-
-// DATABASE
-// Ref: https://www.sqlitetutorial.net/sqlite-nodejs/
-const db_file_path = process.env.DATABASE_FILEPATH || 'ssi.db'; 
-const db_path = path.resolve(__dirname, db_file_path)
-const db =  new sqlite.Database(db_path, (err) => {
-    if(err){
-        logger.error(`SQLite db error:  ${err.message}`)
-    }else{
-        logger.info(`Connected to ssi-infa database. DB path = ${db_path}`)
+  public static getInstance(): Configuration {
+    if (!Configuration.instace) {
+      Configuration.instace = new Configuration();
+      Configuration.instace.setupEnvVar();
+      Configuration.instace.setup();
+      Configuration.instace.setupLogger();
+      Configuration.instace.setupDb();
     }
-});
+    return Configuration.instace;
+  }
 
-// DID Related: 
-// TODO: Not required for this project. so remove
-const did = {
-    sheme : process.env.DID_SCHEME || 'did',
-    method : process.env.DID_METHOD_NAME || 'hypersign',
+  private setup(){
+    this.HOST = process.env.HOST ? process.env.HOST : "localhost";
+    this.PORT = process.env.PORT ? process.env.PORT : "3003";
+    this.LOG_LEVEL = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : "info";
+    this.NODE_ENV = process.env.NODE_ENV ? process.env.NODE_ENV : "development";
+    this.dbConnUrl = process.env.DB_URL && process.env.DB_URL != "" ? process.env.DB_URL :  null;
+    this.baseUrl = "http://" + this.HOST + ":" + this.PORT;
+    this.whitelistedUrls = process.env.WHITELISTED_CORS ? process.env.WHITELISTED_CORS : ['*'];
+
+    this.auth0Tenant = process.env.AUTH0TENANT  ?  process.env.AUTH0TENANT : "https://fidato.us.auth0.com/";
+    this.HIDNODE_RPC_URL = process.env.HIDNODE_RPC_URL ? process.env.HIDNODE_RPC_URL : "http://localhost:26657";
+    this.HIDNODE_REST_URL = process.env.HIDNODE_REST_URL ? process.env.HIDNODE_REST_URL : "http://localhost:1317";
+    
+    this.HID_WALLET_MNEMONIC = process.env.HID_WALLET_MNEMONIC  
+
+    if(!this.HID_WALLET_MNEMONIC){
+      throw new Error('HS-AUTH-SERVER: Error: mnemonic must be set in ENV for hid wallet creation')
+    }
+
+    this.dataDIR = process.env.DATA_DIR
+      ? process.env.DATA_DIR
+      : path.join(homedir(), "boilerplate");
+    if (!fs.existsSync(this.dataDIR)) fs.mkdirSync(this.dataDIR);
+  }
+
+  private setupEnvVar(){
+    // Enviroment  variable
+    ////////////////////////
+    const envPath = path.resolve(
+      __dirname,
+      "../",
+      process.env.NODE_ENV + ".env"
+    );
+
+    console.log(envPath);
+    
+    if (fs.existsSync(envPath)) {
+      dotenv.config({
+        path: envPath,
+      });
+    } else {
+      dotenv.config();
+    }
+  }
+
+  private setupLogger() {
+    const logDIR = path.join(this.dataDIR, "./log");
+    if (!fs.existsSync(logDIR)) fs.mkdirSync(logDIR);
+
+    const { combine, timestamp, printf } = winston.format;
+    const customLogFormat = printf(({ level, message, timestamp }) => {
+      return `${timestamp} [${level}] ${message}`;
+    });
+    const logFilePath = path.join(logDIR, "boilerplate.log");
+    this.logger = winston.createLogger({
+      level: this.LOG_LEVEL || "info",
+      format: combine(timestamp(), customLogFormat),
+      transports: [
+        new winston.transports.File({
+          filename: path.join(logDIR, "boilerplate-error.log"),
+          level: "error",
+        }),
+        new winston.transports.File({ filename: logFilePath }),
+      ],
+    });
+    if (this.NODE_ENV !== "production") {
+      this.logger.add(
+        new winston.transports.Console({
+          format: winston.format.simple(),
+        })
+      );
+    }
+
+    this.logger.info(`Log filepath is set to ${logFilePath}`);
+  }
+
+  private async setupDb(){
+    if(this.dbConnUrl){
+      await mongoose.connect(this.dbConnUrl, 
+        {useNewUrlParser: true, useUnifiedTopology: true })
+        this.db = mongoose.connection;
+    } 
+  }
+
 }
 
-const jwtSecret = process.env.JWT_SECRET || 'secretKey'
-const jwtExpiryInMilli = 240000
-
-const nodeServer = {
-    baseURl: process.env.NODE_SERVER_BASE_URL || "http://localhost:5000/",
-    didCreateEp: process.env.NODE_SERVER_DID_CREATE_EP || "api/did/create_tmp",
-    schemaCreateEp: process.env.NODE_SERVER_SCHEMA_CREATE_EP || "api/schema/create",
-    schemaGetEp: process.env.NODE_SERVER_SCHEMA_GET_EP || "api/schema/get"
-}
-
-const mail = {
-   host: process.env.MAIL_HOST || "smtp.gmail.com",
-   port: process.env.MAIL_PORT || 465 ,
-   user: process.env.MAIL_USERNAME || "example@gmail.com",
-   pass: process.env.MAIL_PASSWORD || "ExamplePassword1@",
-   name: process.env.MAIL_NAME || "Hypermine Admin",
-}
-
-
-const options = { nodeUrl: `${nodeServer.baseURl}`,  didScheme:  "did:hs"}
-const hypersignSDK = {
-    did: hsdk.did(options),
-    credential: hsdk.credential(options)
-}
-
-const hs_schema = {
-    APP_NAME: process.env.SCHEMA_NAME || 'Superhero',
-    ATTRIBUTES: process.env.SCEHMA_ATTRIBUTES || ["Name", "Email"],
-    DESCRIPTION: process.env.SCEHMA_DESCRIPTION || 'Superhero Authentication Credential'
-}
-
-const challengeExpTime = 5 // time at which session challenge will expire (in minutes)
-
-
-const TEMP_CREDENTIAL_DIR = path.join(__dirname + "/../" + "temp/");
-
-
-
-export  {
-    port,
-    host,
-    logger,
-    db,
-    did,
-    jwtSecret,
-    jwtExpiryInMilli,
-    nodeServer,
-    mail,
-    bootstrapConfig,
-    hypersignSDK,
-    challengeExpTime,
-    hs_schema,
-    TEMP_CREDENTIAL_DIR,
-    hostnameurl
-}
+const {
+  db,
+  NODE_ENV,
+  HOST,
+  PORT,
+  baseUrl,
+  logger,
+  whitelistedUrls,
+  auth0Tenant,
+  HIDNODE_RPC_URL,
+  HIDNODE_REST_URL,
+  HID_WALLET_MNEMONIC
+} = Configuration.getInstance();
+export { db, NODE_ENV, HOST, PORT, baseUrl, logger, whitelistedUrls, auth0Tenant, HIDNODE_RPC_URL, HIDNODE_REST_URL, HID_WALLET_MNEMONIC}

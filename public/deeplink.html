@@ -10,7 +10,19 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lrsjng.jquery-qrcode/0.18.0/jquery-qrcode.js" integrity="sha512-k07XFsUtr4GlNmqQnexIG4mS58lorW41CpAsr+hvQ0mIJhcglGdTGeSZcnIBRElbdDTO0vqI9X01tzQ1bCrtyQ==" crossorigin="anonymous"></script>
     <style>
+        @media all and (min-width: 480px) {
+            .deskContent {display:block;}
+            .phoneContent {display:none;}
+        }
+
+        @media all and (max-width: 479px) {
+            .deskContent {display:none;}
+            .phoneContent {display:block;}
+        }
         .button {
+            text-align: center;
+        }
+        .button-web {
             text-align: center;
         }
         
@@ -44,17 +56,25 @@
 <body>
     <nav class="navbar navbar-expand-md navbar-dark mb-3">
         <div class="container-fluid">
-            <img src="https://hypersign.id/wp-content/uploads/2020/01/Banner_logo2.png" />
+            <img src="https://ssi.hypermine.in/hsauth/hypersign_Yellow.webp" />
         </div>
     </nav>
     <div class="container">
         <div class="jumbotron">
-            <h1>Auth Credential</h1>
-            <p class="lead">This is your secret auth credential</p>
-            <p>You can either scan the QR or click on the accept button to store it</p>
-            <p class="lead"><strong>Don't share with anyone.</strong></p>
-            <div id="qrcode"></div>
-            <p class="button"></p>
+            <h2>Credential Issuance</h2>
+            <p class="lead">You are about to receive your credential in Hypersign identity wallet. This credential might contain your personal information.</p>
+            <p class="lead"><strong>Don't share this with someone you not trust!</strong></p>
+            <!-- <div id="qrcode"></div>
+            <p class="button"></p> -->
+            <div class="deskContent">
+                <p>You can either scan the QR to load in mobile wallet or click on the accept button to store it in web wallet</p>
+                <div id="qrcode"></div>
+                <p class="button-web"></p>
+            </div>
+            <div class="phoneContent">
+                <p class="button"></p>
+                <p class="button-web"></p>
+            </div>
         </div>
         <hr>
         <footer>
@@ -74,9 +94,19 @@
 
 
             const qrText = deeplink.split('url=')[1];;
-
-            const buttonhtml = `<a  class="btn " href='${deeplink}' target='_blank'>Accept Credenital</a>`;
+            const weblink = "https://wallet.hypermine.in/deeplink?url=" + qrText
+            const buttonhtml = `<a  class="btn " href='${deeplink}' target='_blank'>Accept Credential in Mobile Wallet</a>`;
+            const buttonhtmlweb = `<a  class="btn " href='${weblink}' target='_blank'>Accept Credential in Web Wallet</a>`;
             $('.button').html(buttonhtml);
+            $('.button-web').html(`<a class="btn" href="#">Accept Credential in Web Wallet</a>`);
+            $('.button-web').click(function(){ 
+                    window.open(
+                        weblink,
+                        "popUpWindow",
+                        `height=800,width=400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes`
+                    );
+            });
+
             $("#qrcode").qrcode({
                 "width": 200,
                 "height": 200,

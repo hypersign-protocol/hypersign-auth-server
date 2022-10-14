@@ -1,22 +1,16 @@
-FROM node:12.6.0-buster
+FROM node:current-alpine3.13
 
-# setting up the working dir
+RUN mkdir -p /usr/src/app/dist
 WORKDIR /usr/src/app
 
-# setting up env var from .env file
-# COPY .env .
-# RUN /bin/bash -c "source /usr/src/app/.env"
+# copy bundled code base
+COPY dist/api.bundle.js dist
 
-# pushing the code inside
-COPY package*.json ./
-RUN npm install
-ADD . /usr/src/app
-RUN rm -f .env*
+# copy env var
+COPY production.env .
 
-# setting up the project
-RUN npm run build
-RUN npm run newdb
+# env 
+ENV NODE_ENV=production
 
-EXPOSE $PORT
-
-CMD npm run bootstrap && npm run start
+# command to run when the image is initiated
+CMD ["node", "dist/api.bundle.js"]

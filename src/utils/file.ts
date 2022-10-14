@@ -1,9 +1,5 @@
 import fs from 'fs';
-import {TEMP_CREDENTIAL_DIR} from '../config'
 
-if (!fs.existsSync(TEMP_CREDENTIAL_DIR)) {
-    fs.mkdirSync(TEMP_CREDENTIAL_DIR);
-}
 
 export const store = (data, filePath) => {
     if (!data) throw new Error("Data undefined")
