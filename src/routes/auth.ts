@@ -1,7 +1,9 @@
 import { Router } from "express";
 import  hsJson  from '../../hypersign.json';
+import { verifyAccessTokenForThridPartyAuth } from '../middleware/auth';
 import {registerSchemaBody}from "../middleware/registerSchema";
 import { validateRequestSchema } from "../middleware/validateRequestSchema";
+
 
 interface IHypersignAuth{
 
@@ -37,7 +39,8 @@ export = (hypersign: IHypersignAuth) => {
   } )
   // Implement /register API:
   // Analogous to register user but not yet activated
-   router.post("/register", addExpirationDateMiddleware ,hypersign.register.bind(hypersign), (req, res) => {
+
+  router.post("/register", verifyAccessTokenForThridPartyAuth, hypersign.register.bind(hypersign), (req, res) => {
     try {
       console.log("Register success");
       // You can store userdata (req.body) but this user is not yet activated since he has not
@@ -51,7 +54,6 @@ export = (hypersign: IHypersignAuth) => {
           error: null,
         });
       }
-
       return res.status(200).send({ status: 200, message: "A QR code has been sent to emailId you provided. Kindly scan the QR code with Hypersign Identity Wallet to receive Hypersign Auth Credential.", error: null });
 
     } catch (e) {

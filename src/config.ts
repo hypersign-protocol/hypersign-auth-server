@@ -17,9 +17,12 @@ class Configuration {
   public dataDIR: string;
   private dbConnUrl: string;
   public whitelistedUrls: any;
+  public auth0Tenant: string;
+
   public HIDNODE_RPC_URL: string;
   public HIDNODE_REST_URL: string;
   public HID_WALLET_MNEMONIC: string;
+  
   private constructor() {}
 
   public static getInstance(): Configuration {
@@ -41,6 +44,8 @@ class Configuration {
     this.dbConnUrl = process.env.DB_URL && process.env.DB_URL != "" ? process.env.DB_URL :  null;
     this.baseUrl = "http://" + this.HOST + ":" + this.PORT;
     this.whitelistedUrls = process.env.WHITELISTED_CORS ? process.env.WHITELISTED_CORS : ['*'];
+
+    this.auth0Tenant = process.env.AUTH0TENANT  ?  process.env.AUTH0TENANT : "https://fidato.us.auth0.com/";
     this.HIDNODE_RPC_URL = process.env.HIDNODE_RPC_URL ? process.env.HIDNODE_RPC_URL : "http://localhost:26657";
     this.HIDNODE_REST_URL = process.env.HIDNODE_REST_URL ? process.env.HIDNODE_REST_URL : "http://localhost:1317";
     
@@ -125,10 +130,10 @@ const {
   baseUrl,
   logger,
   whitelistedUrls,
+  auth0Tenant
+} = Configuration.getInstance();
+export { db, NODE_ENV, HOST, PORT, baseUrl, logger, whitelistedUrls, auth0Tenant };
   HIDNODE_RPC_URL,
   HIDNODE_REST_URL,
   HID_WALLET_MNEMONIC
 } = Configuration.getInstance();
-export { db, NODE_ENV, HOST, PORT, baseUrl, logger, whitelistedUrls,  HIDNODE_RPC_URL,
-  HIDNODE_REST_URL,
-  HID_WALLET_MNEMONIC };
