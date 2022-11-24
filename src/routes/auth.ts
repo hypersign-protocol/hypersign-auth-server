@@ -3,8 +3,16 @@ import hsJson from '../../hypersign.json';
 import { verifyAccessTokenForThridPartyAuth } from '../middleware/auth';
 import { registerSchemaBody } from "../middleware/registerSchema";
 import { validateRequestSchema } from "../middleware/validateRequestSchema";
-import queue from '../services'
+import { HIDNODE_REST_URL } from '../config'
+let c = 0
 
+import Redis from 'ioredis';
+
+const redis = new Redis({
+  port: 6379,
+  host: 'localhost',
+
+})
 
 interface IHypersignAuth {
 
@@ -38,6 +46,57 @@ export = (hypersign: IHypersignAuth) => {
   router.get('/test', (req, res) => {
     res.send("Hello")
   })
+
+  // Implement /vcId status check
+
+  router.get('/vcstatus/:vcId', async (req, res) => {
+    try {
+      const { vcId } = req.params;
+      interface Ivc {
+        credStatus: {
+          claim: {
+            currentStatus: string
+          }
+        }
+      }
+      // const vc = await redis.addListener(vcId)
+      const vc = await fetch(`${HIDNODE_REST_URL}hypersign-protocol/hidnode/ssi/credential/${vcId}`)
+
+      const vcData: Ivc = await vc.json()
+
+
+      if (vcData.credStatus.claim === null) {
+        let result = await redis.call('ft.search', 'idx:vc-txn-err', vcId.split(":")[3])
+        
+        const key= result[1]
+        result = result[0]
+
+        const error=await redis.hget(key, 'error')
+
+        console.log(error);
+        
+        if (result === 0) {
+          return res.status(404).send({ status: 404, message: "VC not found", error: null, vc: null });
+        }
+        if (result === 1) {
+          return res.status(404).send({ status: 404, message: "VC not Found", error , vc: null });
+
+        }
+      } else if (vcData.credStatus.claim.currentStatus === 'Live') {
+        return res.status(200).send({ status: 200, message: "VC found", error: "", vc: vcData });
+      } else {
+        return res.status(404).send({ status: 404, message: "VC not found", error: "", vc: null });
+      }
+    } catch (error) {
+
+      console.log(error);
+
+
+      return res.status(404).send({ status: 404, message: "VC not found", error: error, vc: null });
+
+    }
+  })
+
   // Implement /register API:
   // Analogous to register user but not yet activated
   router.post("/register", /*verifyAccessTokenForThridPartyAuth,*/ addExpirationDateMiddleware, hypersign.register.bind(hypersign), async (req, res) => {
@@ -50,11 +109,16 @@ export = (hypersign: IHypersignAuth) => {
         const vcIdarr = req.body.hypersign.data.signedVC.id.split(':')
         const vcId = vcIdarr[vcIdarr.length - 1]
         if (vcId.length === 45) {
-          await queue.addJob({ data: { proof: req.body.hypersign.data.proof, credentialStatus: req.body.hypersign.data.credentialStatus } })
+          //  await queue.addJob({ data: { credentialStatus: req.body.hypersign.data.credentialStatus, proof: req.body.hypersign.data.proof } })
+          console.log(req.body.hypersign.data.txn);
+          //  await redis.rpush('vc-txn', JSON.stringify( {
+          //     proof: req.body.hypersign.data.proof,
+          //     credentialStatus: req.body.hypersign.data.credentialStatus,
+          //  }))
+          await redis.rpush('vc-txn', JSON.stringify({ txn: req.body.hypersign.data.txn, vcId: req.body.hypersign.data.signedVC.id }))
 
         } else {
-          return res.send({
-            status: 400,
+          return res.status(400).send({
             message: null,
             error: "Invalid VC",
           })
@@ -62,6 +126,8 @@ export = (hypersign: IHypersignAuth) => {
         // push to the queue for further processing
         // await queue.addBulkJob([{name:"credential", data:{proof: req.body.hypersign.data.proof, credentialStatus: req.body.hypersign.data.credentialStatus}}])
         //
+
+
 
         return res
           .status(200)

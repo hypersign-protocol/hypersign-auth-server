@@ -23,7 +23,4 @@ async function init() {
      await hsSdk.init();
         return hsSdk;
     }
-
-
-
 export default init;
