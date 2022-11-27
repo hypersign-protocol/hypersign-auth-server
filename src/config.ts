@@ -142,4 +142,8 @@ const MAX_BATCH_SIZE=process.env.MAX_BATCH_SIZE ? parseInt(process.env.MAX_BATCH
 const MINIMUM_DELAY=process.env.MINIMUM_DELAY ? parseInt(process.env.MINIMUM_DELAY) : 1000;
 const MAXIMUM_DELAY=process.env.MAXIMUM_DELAY ? parseInt(process.env.MAXIMUM_DELAY) : 60000;
 
-export { MAXIMUM_DELAY,MINIMUM_DELAY, MAX_BATCH_SIZE, db, NODE_ENV, HOST, PORT, baseUrl, logger, whitelistedUrls, auth0Tenant, HIDNODE_RPC_URL, HIDNODE_REST_URL, HID_WALLET_MNEMONIC }
+const REDIS_HOST= process.env.REDIS_HOST || 'localhost'
+const REDIS_PORT=process.env.REDIS_PORT || '6379'
+const REDIS_PASSWORD=process.env.REDIS_PASSWORD || ''
+
+export {REDIS_HOST,REDIS_PORT,REDIS_PASSWORD, MAXIMUM_DELAY,MINIMUM_DELAY, MAX_BATCH_SIZE, db, NODE_ENV, HOST, PORT, baseUrl, logger, whitelistedUrls, auth0Tenant, HIDNODE_RPC_URL, HIDNODE_REST_URL, HID_WALLET_MNEMONIC }

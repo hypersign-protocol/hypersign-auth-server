@@ -1,10 +1,12 @@
 import Redis from 'ioredis'
 import hsSdk from './wallet'
 import { delay } from 'bullmq'
-import { MAXIMUM_DELAY, MAX_BATCH_SIZE, MINIMUM_DELAY } from '../config'
+
+import { logger, MAXIMUM_DELAY, MAX_BATCH_SIZE, MINIMUM_DELAY ,REDIS_HOST,REDIS_PASSWORD,REDIS_PORT } from '../config'
 const redis = new Redis({
-    port: 6379,
-    host: 'localhost',
+    port: parseInt(REDIS_PORT),
+    host: REDIS_HOST,
+    password: REDIS_PASSWORD,
 
 })
 
@@ -12,16 +14,36 @@ let sdk = undefined
 let pause_duration = MINIMUM_DELAY
 
 let erroridx = 0;
+let txnidx = 0
 
 const runner = async () => {
     if (sdk === undefined) {
         sdk = await hsSdk()
         try {
             const idx = await redis.call('ft._list') as Array<string>
+
+            if (await redis.hget("vc-counter-vars", "erroridx") === null) {
+                erroridx = 0
+            } else {
+                erroridx = parseInt(await redis.hget("vc-counter-vars", "erroridx"))
+            }
+
+            if (await redis.hget("vc-counter-vars", "txnidx") === null) {
+                txnidx = 0
+            } else {
+                txnidx = parseInt(await redis.hget("vc-counter-vars", "txnidx"))
+            }
+
+
             if (!idx.includes('idx:vc-txn-err')) {
                 await redis.call("ft.create", "idx:vc-txn-err", "on", "hash", "prefix", "1", "vc-txn-err:", "schema", "error", "text", "unregistred-credentials", "text")
-                console.log("created index for redi search");
-                
+                console.log("created index for redisearch");
+
+            }
+            if (!idx.includes('idx:vc-txn')) {
+                await redis.call("ft.create", "idx:vc-txn", "on", "hash", "prefix", "1", "vc-txn:", "schema", "txid", "text", "successful-txn", "text")
+                console.log("created index for redisearch");
+
             }
 
         } catch (error) {
@@ -41,6 +63,7 @@ const runner = async () => {
         try {
             const res = await sdk.vc.registerCredentialStatusTxnBulk(newList)
             console.log(res.transactionHash);
+            await redis.hset(`vc-txn:${txnidx++}`, { 'txid': res.transactionHash, 'successful-txn': logdata })
             await redis.ltrim('vc-txn', MAX_BATCH_SIZE, -1)
             // const x = await redis.hset(`vc-txn-hash:${res.transactionHash}`, {...logdata})
             //  console.log(x);
@@ -60,6 +83,7 @@ const runner = async () => {
     pause_duration > MAXIMUM_DELAY ? pause_duration = MAXIMUM_DELAY : pause_duration = pause_duration + 100
 
     await delay(pause_duration)
+    redis.hset("vc-counter-vars",{erroridx,txnidx})
     return await runner()
 
 }

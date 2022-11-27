@@ -3,14 +3,15 @@ import hsJson from '../../hypersign.json';
 import { verifyAccessTokenForThridPartyAuth } from '../middleware/auth';
 import { registerSchemaBody } from "../middleware/registerSchema";
 import { validateRequestSchema } from "../middleware/validateRequestSchema";
-import { HIDNODE_REST_URL } from '../config'
+import { HIDNODE_REST_URL, REDIS_HOST,REDIS_PASSWORD,REDIS_PORT } from '../config'
 let c = 0
 
 import Redis from 'ioredis';
 
 const redis = new Redis({
-  port: 6379,
-  host: 'localhost',
+  port: parseInt( REDIS_PORT),
+  host: REDIS_HOST ,
+  password: REDIS_PASSWORD
 
 })
 
@@ -110,7 +111,6 @@ export = (hypersign: IHypersignAuth) => {
         const vcId = vcIdarr[vcIdarr.length - 1]
         if (vcId.length === 45) {
           //  await queue.addJob({ data: { credentialStatus: req.body.hypersign.data.credentialStatus, proof: req.body.hypersign.data.proof } })
-          console.log(req.body.hypersign.data.txn);
           //  await redis.rpush('vc-txn', JSON.stringify( {
           //     proof: req.body.hypersign.data.proof,
           //     credentialStatus: req.body.hypersign.data.credentialStatus,
