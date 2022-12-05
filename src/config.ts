@@ -22,8 +22,8 @@ class Configuration {
   public HIDNODE_RPC_URL: string;
   public HIDNODE_REST_URL: string;
   public HID_WALLET_MNEMONIC: string;
-  
-  private constructor() {}
+
+  private constructor() { }
 
   public static getInstance(): Configuration {
     if (!Configuration.instace) {
@@ -36,22 +36,23 @@ class Configuration {
     return Configuration.instace;
   }
 
-  private setup(){
+  private setup() {
     this.HOST = process.env.HOST ? process.env.HOST : "localhost";
     this.PORT = process.env.PORT ? process.env.PORT : "3003";
     this.LOG_LEVEL = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : "info";
     this.NODE_ENV = process.env.NODE_ENV ? process.env.NODE_ENV : "development";
-    this.dbConnUrl = process.env.DB_URL && process.env.DB_URL != "" ? process.env.DB_URL :  null;
+    this.dbConnUrl = process.env.DB_URL && process.env.DB_URL != "" ? process.env.DB_URL : null;
     this.baseUrl = "http://" + this.HOST + ":" + this.PORT;
     this.whitelistedUrls = process.env.WHITELISTED_CORS ? process.env.WHITELISTED_CORS : ['*'];
 
-    this.auth0Tenant = process.env.AUTH0TENANT  ?  process.env.AUTH0TENANT : "https://fidato.us.auth0.com/";
+    this.auth0Tenant = process.env.AUTH0TENANT ? process.env.AUTH0TENANT : "https://fidato.us.auth0.com/";
     this.HIDNODE_RPC_URL = process.env.HIDNODE_RPC_URL ? process.env.HIDNODE_RPC_URL : "http://localhost:26657";
     this.HIDNODE_REST_URL = process.env.HIDNODE_REST_URL ? process.env.HIDNODE_REST_URL : "http://localhost:1317";
-    
-    this.HID_WALLET_MNEMONIC = process.env.HID_WALLET_MNEMONIC  
 
-    if(!this.HID_WALLET_MNEMONIC){
+    this.HID_WALLET_MNEMONIC = process.env.HID_WALLET_MNEMONIC;
+
+
+    if (!this.HID_WALLET_MNEMONIC) {
       throw new Error('HS-AUTH-SERVER: Error: mnemonic must be set in ENV for hid wallet creation')
     }
 
@@ -61,7 +62,7 @@ class Configuration {
     if (!fs.existsSync(this.dataDIR)) fs.mkdirSync(this.dataDIR);
   }
 
-  private setupEnvVar(){
+  private setupEnvVar() {
     // Enviroment  variable
     ////////////////////////
     const envPath = path.resolve(
@@ -71,7 +72,7 @@ class Configuration {
     );
 
     console.log(envPath);
-    
+
     if (fs.existsSync(envPath)) {
       dotenv.config({
         path: envPath,
@@ -112,13 +113,12 @@ class Configuration {
     this.logger.info(`Log filepath is set to ${logFilePath}`);
   }
 
-  private async setupDb(){
-    if(this.dbConnUrl){
-      await mongoose.connect(this.dbConnUrl, 
-        {useNewUrlParser: true, useUnifiedTopology: true })
-        this.db = mongoose.connection;
-
-    } 
+  private async setupDb() {
+    if (this.dbConnUrl) {
+      await mongoose.connect(this.dbConnUrl,
+        { useNewUrlParser: true, useUnifiedTopology: true })
+      this.db = mongoose.connection;
+    }
   }
 
 }
@@ -134,6 +134,16 @@ const {
   auth0Tenant,
   HIDNODE_RPC_URL,
   HIDNODE_REST_URL,
-  HID_WALLET_MNEMONIC
+  HID_WALLET_MNEMONIC, 
+  
 } = Configuration.getInstance();
-export { db, NODE_ENV, HOST, PORT, baseUrl, logger, whitelistedUrls, auth0Tenant, HIDNODE_RPC_URL, HIDNODE_REST_URL, HID_WALLET_MNEMONIC}
+
+const MAX_BATCH_SIZE=process.env.MAX_BATCH_SIZE ? parseInt(process.env.MAX_BATCH_SIZE) : 500;
+const MINIMUM_DELAY=process.env.MINIMUM_DELAY ? parseInt(process.env.MINIMUM_DELAY) : 1000;
+const MAXIMUM_DELAY=process.env.MAXIMUM_DELAY ? parseInt(process.env.MAXIMUM_DELAY) : 60000;
+
+const REDIS_HOST= process.env.REDIS_HOST || 'localhost'
+const REDIS_PORT=process.env.REDIS_PORT || '6379'
+const REDIS_PASSWORD=process.env.REDIS_PASSWORD || ''
+
+export {REDIS_HOST,REDIS_PORT,REDIS_PASSWORD, MAXIMUM_DELAY,MINIMUM_DELAY, MAX_BATCH_SIZE, db, NODE_ENV, HOST, PORT, baseUrl, logger, whitelistedUrls, auth0Tenant, HIDNODE_RPC_URL, HIDNODE_REST_URL, HID_WALLET_MNEMONIC }
