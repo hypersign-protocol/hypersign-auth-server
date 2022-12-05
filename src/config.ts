@@ -117,6 +117,7 @@ class Configuration {
       await mongoose.connect(this.dbConnUrl, 
         {useNewUrlParser: true, useUnifiedTopology: true })
         this.db = mongoose.connection;
+
     } 
   }
 
