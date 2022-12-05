@@ -79,7 +79,7 @@ const runner = async () => {
             await redis.ltrim('vc-txn', MAX_BATCH_SIZE, -1)
         }
     }
-    console.log('----------------------------', pause_duration)
+    // console.log('----------------------------', pause_duration)
     pause_duration > MAXIMUM_DELAY ? pause_duration = MAXIMUM_DELAY : pause_duration = pause_duration + 100
 
     await delay(pause_duration)
