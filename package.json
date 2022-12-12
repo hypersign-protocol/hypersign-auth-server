@@ -25,7 +25,7 @@
         "express-validator": "^6.12.2",
         "helmet": "^4.4.1",
         "hid-hd-wallet": "https://github.com/hypersign-protocol/hid-hd-wallet#ssi-integration",
-        "hs-ssi-sdk": "https://github.com/hypersign-protocol/hid-ssi-js-sdk#credential-register-optional",
+        "hs-ssi-sdk": "https://github.com/hypersign-protocol/hid-ssi-js-sdk#credential-revocation",
         "hypersign-auth-node-sdk": "https://github.com/hypersign-protocol/hypersign-auth-node-sdk#registration-on-registry-optional",
         "ioredis": "^5.2.4",
         "mongoose": "^5.12.3",

@@ -106,10 +106,7 @@ export = (hypersign: IHypersignAuth) => {
       // You can store userdata (req.body) but this user is not yet activated since he has not
       // validated his email.
 
-      if (req.body.hypersign.data.signedVC !== undefined) {
-        const vcIdarr = req.body.hypersign.data.signedVC.id.split(':')
-        const vcId = vcIdarr[vcIdarr.length - 1]
-        if (vcId.length === 45) {
+      if (req.body.hypersign.data.signedVC !== undefined) {        
           //  await queue.addJob({ data: { credentialStatus: req.body.hypersign.data.credentialStatus, proof: req.body.hypersign.data.proof } })
           //  await redis.rpush('vc-txn', JSON.stringify( {
           //     proof: req.body.hypersign.data.proof,
@@ -117,12 +114,7 @@ export = (hypersign: IHypersignAuth) => {
           //  }))
           await redis.rpush('vc-txn', JSON.stringify({ txn: req.body.hypersign.data.txn, vcId: req.body.hypersign.data.signedVC.id }))
 
-        } else {
-          return res.status(400).send({
-            message: null,
-            error: "Invalid VC",
-          })
-        }
+       
         // push to the queue for further processing
         // await queue.addBulkJob([{name:"credential", data:{proof: req.body.hypersign.data.proof, credentialStatus: req.body.hypersign.data.credentialStatus}}])
         //
