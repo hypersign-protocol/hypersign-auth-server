@@ -78,7 +78,7 @@ hidWalletInstance.generateWallet({ mnemonic: HID_WALLET_MNEMONIC }).then(async (
 
   app.use('/hs/api/v2', authRoutes(hypersign));
   app.use('/hs/api/v2', walletRoutes(hidWalletInstance));
-  app.use('hs/api/v2',edvRoutes(hypersign))
+  app.use('/hs/api/v2',edvRoutes(hypersign))
   app.get('/shared/vp/:id', async (req, res) => {
     try {
 

@@ -3,6 +3,8 @@ import hsJson from '../../hypersign.json';
 import { verifyAccessTokenForThridPartyAuth } from '../middleware/auth';
 import { registerSchemaBody } from "../middleware/registerSchema";
 import { validateRequestSchema } from "../middleware/validateRequestSchema";
+import { IUserModel } from '../models/userModel';
+import userServices from "../services/userServices";
 import { HIDNODE_REST_URL, REDIS_HOST,REDIS_PASSWORD,REDIS_PORT } from '../config'
 let c = 0
 
@@ -31,6 +33,36 @@ interface IHypersignAuth {
 
   poll(req, res, next): Promise<any>;
 
+}
+
+
+async function userExistsMiddleWare(req,res,next){
+    const userService=new userServices()
+    
+    
+    const {user,isisThridPartyAuth,thridPartyAuthProvider}=req.body
+    const userData:IUserModel={
+      userId:user.email,
+      sequenceNo:0,
+      docId:''
+    } as IUserModel
+    const record=await userService.userExists(userData.userId)
+    if(record.exists){
+      // User already exists
+      // get from edv 
+      // decrypt
+      return res.status(200).send({
+        status: 200,
+        message: "User already exists",
+        error: null,
+        data: {
+          record
+          },
+        },
+      );
+    } 
+    next()
+  
 }
 
 function addExpirationDateMiddleware(req, res, next) {
@@ -100,11 +132,12 @@ export = (hypersign: IHypersignAuth) => {
 
   // Implement /register API:
   // Analogous to register user but not yet activated
-  router.post("/register", verifyAccessTokenForThridPartyAuth, addExpirationDateMiddleware, hypersign.register.bind(hypersign), async (req, res) => {
+  router.post("/register", verifyAccessTokenForThridPartyAuth, userExistsMiddleWare,addExpirationDateMiddleware, hypersign.register.bind(hypersign), async (req, res) => {
     try {
       console.log("Register success");
       // You can store userdata (req.body) but this user is not yet activated since he has not
       // validated his email.
+      
 
       if (req.body.hypersign.data.signedVC !== undefined) {        
           //  await queue.addJob({ data: { credentialStatus: req.body.hypersign.data.credentialStatus, proof: req.body.hypersign.data.proof } })
