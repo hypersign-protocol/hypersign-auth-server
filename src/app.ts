@@ -9,6 +9,10 @@ import http from 'http';
 import HIDWallet from 'hid-hd-wallet';
 import hsSSIdk from 'hs-ssi-sdk'
 import vpschema from './models/vp';
+import userServices from './services/userServices';
+import { IUserModel } from './models/userModel';
+import edvRoutes from './routes/edvRoutes';
+
 
 const app = express();
 
@@ -74,6 +78,7 @@ hidWalletInstance.generateWallet({ mnemonic: HID_WALLET_MNEMONIC }).then(async (
 
   app.use('/hs/api/v2', authRoutes(hypersign));
   app.use('/hs/api/v2', walletRoutes(hidWalletInstance));
+  app.use('hs/api/v2',edvRoutes(hypersign))
   app.get('/shared/vp/:id', async (req, res) => {
     try {
 
@@ -88,6 +93,8 @@ hidWalletInstance.generateWallet({ mnemonic: HID_WALLET_MNEMONIC }).then(async (
 
 
   })
+
+
   app.post('/share', async (req, res) => {
     try {
       const { vp } = req.body;
@@ -134,9 +141,39 @@ hidWalletInstance.generateWallet({ mnemonic: HID_WALLET_MNEMONIC }).then(async (
   })
 
 
+// app.post('/user',async (req,res)=>{
+//   try {
+   
+// const userData:IUserModel = {
+//   userId: 'test',
+//     sequenceNo: 1,
+//     docId: 'testabc'    
+    
+// } as IUserModel;
+//     const userService = new userServices();
+//     // const records = await userService.createUser(userData);
+//     const records = await userService.updateUser('test',userData)
+
+//     const record = await userService.userExists('test');
+//      res.status(200).json({
+//         record
+//       })
+//   } catch (error) {
+//     res.status(500).json({
+//       status:'error',
+//       message:error.message
+//     })
+//   }
+
+// })
+
 })
   .catch(e => {
     console.error(e)
   })
+
+
+
+  
 
 app.listen(PORT, () => console.log('Server is running @ ' + baseUrl));
