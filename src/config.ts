@@ -146,4 +146,9 @@ const REDIS_HOST= process.env.REDIS_HOST || 'localhost'
 const REDIS_PORT=process.env.REDIS_PORT || '6379'
 const REDIS_PASSWORD=process.env.REDIS_PASSWORD || ''
 
-export {REDIS_HOST,REDIS_PORT,REDIS_PASSWORD, MAXIMUM_DELAY,MINIMUM_DELAY, MAX_BATCH_SIZE, db, NODE_ENV, HOST, PORT, baseUrl, logger, whitelistedUrls, auth0Tenant, HIDNODE_RPC_URL, HIDNODE_REST_URL, HID_WALLET_MNEMONIC }
+const EDV_DID_FILE_PATH=process.env.EDV_DID_FILE_PATH || 'edv/did.json'
+const EDV_KEY_FILE_PATH=process.env.EDV_KEY_FILE_PATH || 'edv/key.json'
+const EDV_CONFIG_DIR=process.env.EDV_CONFIG_DIR || 'edv'
+const EDV_ID=process.env.EDV_ID || 'did:example:123456789abcdefghi'
+const EDV_BASE_URL=process.env.EDV_BASE_URL || 'http://localhost:7777/encrypted-data-vaults'
+export {EDV_BASE_URL,EDV_ID,EDV_CONFIG_DIR,EDV_DID_FILE_PATH,EDV_KEY_FILE_PATH,REDIS_HOST,REDIS_PORT,REDIS_PASSWORD, MAXIMUM_DELAY,MINIMUM_DELAY, MAX_BATCH_SIZE, db, NODE_ENV, HOST, PORT, baseUrl, logger, whitelistedUrls, auth0Tenant, HIDNODE_RPC_URL, HIDNODE_REST_URL, HID_WALLET_MNEMONIC }

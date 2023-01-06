@@ -5,9 +5,17 @@ import hsJson from '../../hypersign.json';
 import userServices from '../services/userServices';
 import { IUserModel } from '../models/userModel';
 
-export = (hypersign) => {
+export = (hypersign,edvClient) => {
     const router = Router();
     const userService = new userServices()
+    // console.log(await edv.createDocument({'data':'Pratap'}))
+  // console.log(await edv.updateDocument({'data':'Pratap Mridha '},'3e58715b-6563-4e97-868d-eea8e9515d80'))
+  // console.log(await  edv.getDocument('3e58715b-6563-4e97-868d-eea8e9515d80'));
+  // console.log(await edv.getDecryptedDocument('3e58715b-6563-4e97-868d-eea8e9515d80'));
+  
+  
+  
+
     router.post('/sync',/** middle were for wallet verification*/ async (req, res) => {
         try {
             const { user, document } = req.body

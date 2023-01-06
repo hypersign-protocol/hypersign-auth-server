@@ -1,6 +1,15 @@
 import fs from 'fs';
 
+export const existDir= (dirPath) => {
+if(!dirPath) throw new Error("Directory path undefined")
+return fs.existsSync(dirPath)
 
+}
+
+export const createDir = (dirPath) => {
+    if(!dirPath) throw new Error("Directory path undefined")
+    return fs.mkdirSync(dirPath)
+}
 export const store = (data, filePath) => {
     if (!data) throw new Error("Data undefined")
     fs.writeFileSync(filePath, JSON.stringify(data))
