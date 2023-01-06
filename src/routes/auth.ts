@@ -43,21 +43,32 @@ async function userExistsMiddleWare(req,res,next){
     const {user,isisThridPartyAuth,thridPartyAuthProvider}=req.body
     const userData:IUserModel={
       userId:user.email,
-      sequenceNo:0,
+      sequence:0,
       docId:''
     } as IUserModel
     const record=await userService.userExists(userData.userId)
+
+    
     if(record.exists){
+      const docId=record.user.docId
+
       // User already exists
       // get from edv 
+      const docData=await this.getDecryptedDocument(docId)
+
       // decrypt
-      return res.status(200).send({
-        status: 200,
+      return res.status(403).send({
+        status: 403,
         message: "User already exists",
         error: null,
         data: {
-          record
-          },
+          docId:record.user.docId,
+          sequence:record.user.sequence,
+          userId:record.user.userId
+
+          } as IUserModel,
+          
+          encData:docData
         },
       );
     } 
@@ -73,7 +84,7 @@ function addExpirationDateMiddleware(req, res, next) {
   next();
 }
 
-export = (hypersign: IHypersignAuth) => {
+export = (hypersign: IHypersignAuth,edvClient) => {
   const router = Router();
 
   router.get('/test', (req, res) => {
@@ -132,7 +143,7 @@ export = (hypersign: IHypersignAuth) => {
 
   // Implement /register API:
   // Analogous to register user but not yet activated
-  router.post("/register", verifyAccessTokenForThridPartyAuth, userExistsMiddleWare,addExpirationDateMiddleware, hypersign.register.bind(hypersign), async (req, res) => {
+  router.post("/register", verifyAccessTokenForThridPartyAuth, userExistsMiddleWare.bind(edvClient),addExpirationDateMiddleware, hypersign.register.bind(hypersign), async (req, res) => {
     try {
       console.log("Register success");
       // You can store userdata (req.body) but this user is not yet activated since he has not

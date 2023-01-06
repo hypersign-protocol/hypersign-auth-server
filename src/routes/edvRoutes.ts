@@ -19,28 +19,42 @@ export = (hypersign,edvClient) => {
     router.post('/sync',/** middle were for wallet verification*/ async (req, res) => {
         try {
             const { user, document } = req.body
-            delete user.document
-            user.docId=document
+
+
+            //add document validation document must be json compatible
+            
             const userData: IUserModel = user as IUserModel
-            userData.docId = document
+            
             let response;
             let status = 201;
             const record = await userService.userExists(userData.userId)
             if (record.exists) {
+                
+                userData.sequence=record.user.sequence
+                userData.docId=record.user.docId
 
+                //update document in edv
+                //get sequence number from edv and document id from edv
+                const edvResp=await edvClient.updateDocument(document,userData.docId)
+                userData.sequence=edvResp.sequence
+                userData.docId=edvResp.id
                 // reencrypt and update to edv
                 
                 //incase of sequence number change
                 response=await userService.updateUser(user.userId,userData)
+                
+                
                 status = 200
             } else {
                 // reencrypt and add document to edv
                 //get sequence number from edv and document id from edv
+                console.log("/sync new");
+
+                const edvResp=await edvClient.createDocument(document)
+                        
                 
-                
-                const sequenceNo=1
-                userData.docId=document
-                userData.sequenceNo=sequenceNo
+                userData.sequence=edvResp.sequence
+                userData.docId=edvResp.id
                 
                 response = await userService.createUser(userData)
             }

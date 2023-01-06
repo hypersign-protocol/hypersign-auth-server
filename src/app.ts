@@ -98,7 +98,7 @@ hidWalletInstance.generateWallet({ mnemonic: HID_WALLET_MNEMONIC }).then(async (
   await edv.init()
 
   
-  app.use('/hs/api/v2', authRoutes(hypersign));
+  app.use('/hs/api/v2', authRoutes(hypersign,edv));
   app.use('/hs/api/v2', walletRoutes(hidWalletInstance));
   app.use('/hs/api/v2', edvRoutes(hypersign,edv))
   app.get('/shared/vp/:id', async (req, res) => {
@@ -168,7 +168,7 @@ hidWalletInstance.generateWallet({ mnemonic: HID_WALLET_MNEMONIC }).then(async (
 
   // const userData:IUserModel = {
   //   userId: 'test',
-  //     sequenceNo: 1,
+  //     sequence: 1,
   //     docId: 'testabc'    
 
   // } as IUserModel;

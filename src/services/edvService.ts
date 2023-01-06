@@ -122,8 +122,8 @@ export default class EncryptedDataVaultService {
 
     public async createDocument(doc: Object) {
         const { edvClient, edvId } = this;
-        const { id } = await edvClient.insertDoc({ document: doc, edvId });
-        return id;
+        const  resp = await edvClient.insertDoc({ document: doc, edvId });
+        return resp;
     }
 
     public async updateDocument(doc: Object, id: string) {
