@@ -48,7 +48,6 @@ export = (hypersign,edvClient) => {
             } else {
                 // reencrypt and add document to edv
                 //get sequence number from edv and document id from edv
-                console.log("/sync new");
 
                 const edvResp=await edvClient.createDocument(document)
                         
@@ -65,6 +64,46 @@ export = (hypersign,edvClient) => {
                 error.message
             )
         }
+    })
+
+
+
+
+
+    router.get('/sync/:userId',async (req, res) => {
+        try {
+
+            const {userId}=req.params
+    
+            const record = await userService.userExists(userId)
+            let userData={} as IUserModel
+            
+
+            if(record.exists){
+                
+                userData.sequence=record.user.sequence
+                userData.docId=record.user.docId
+    
+                const edvResp=await edvClient.getDecryptedDocument(userData.docId)
+    
+                res.status(200).json(
+                    edvResp
+                )
+    
+    
+            }else{
+                res.status(500).json({
+                    message:"User not found."
+                })
+            }
+        } catch (error) {
+            res.status(500).json({
+                error
+            })
+        }
+       
+
+
     })
 
 

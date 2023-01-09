@@ -68,7 +68,6 @@ async function userExistsMiddleWare(req,res,next){
 
           } as IUserModel,
           
-          encData:docData
         },
       );
     } 
