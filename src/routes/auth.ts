@@ -1,6 +1,6 @@
 import { Router } from "express";
 import hsJson from '../../hypersign.json';
-import { verifyAccessTokenForThridPartyAuth } from '../middleware/auth';
+import { issueJWT, verifyAccessTokenForThridPartyAuth } from '../middleware/auth';
 import { registerSchemaBody } from "../middleware/registerSchema";
 import { validateRequestSchema } from "../middleware/validateRequestSchema";
 import { IUserModel } from '../models/userModel';
@@ -40,7 +40,8 @@ async function userExistsMiddleWare(req,res,next){
     const userService=new userServices()
     
     
-    const {user,isisThridPartyAuth,thridPartyAuthProvider}=req.body
+    const {user,isisThridPartyAuth,thridPartyAuthProvider,authToken}=req.body
+    
     const userData:IUserModel={
       userId:user.email,
       sequence:0,
@@ -67,8 +68,9 @@ async function userExistsMiddleWare(req,res,next){
           userId:record.user.userId
 
           } as IUserModel,
-          
+          authToken
         },
+        
       );
     } 
     next()
@@ -142,13 +144,13 @@ export = (hypersign: IHypersignAuth,edvClient) => {
 
   // Implement /register API:
   // Analogous to register user but not yet activated
-  router.post("/register", verifyAccessTokenForThridPartyAuth, userExistsMiddleWare.bind(edvClient),addExpirationDateMiddleware, hypersign.register.bind(hypersign), async (req, res) => {
+  router.post("/register", verifyAccessTokenForThridPartyAuth,issueJWT, userExistsMiddleWare.bind(edvClient),addExpirationDateMiddleware, hypersign.register.bind(hypersign), async (req, res) => {
     try {
       console.log("Register success");
       // You can store userdata (req.body) but this user is not yet activated since he has not
       // validated his email.
       
-
+      const {authToken}=req.body
       if (req.body.hypersign.data.signedVC !== undefined) {        
           //  await queue.addJob({ data: { credentialStatus: req.body.hypersign.data.credentialStatus, proof: req.body.hypersign.data.proof } })
           //  await redis.rpush('vc-txn', JSON.stringify( {
@@ -170,6 +172,7 @@ export = (hypersign: IHypersignAuth,edvClient) => {
             status: 200,
             message: req.body.hypersign.data.signedVC,
             error: null,
+            authToken,
           });
       }
 
@@ -180,6 +183,8 @@ export = (hypersign: IHypersignAuth,edvClient) => {
             status: 200,
             message: req.body.hypersign.data,
             error: null,
+            authToken,
+
           });
       }
       return res.status(200).send({ status: 200, message: "A QR code has been sent to emailId you provided. Kindly scan the QR code with Hypersign Identity Wallet to receive Hypersign Auth Credential.", error: null });

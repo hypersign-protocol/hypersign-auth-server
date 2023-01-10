@@ -33,6 +33,7 @@
         "hypersign-auth-node-sdk": "https://github.com/hypersign-protocol/hypersign-auth-node-sdk#registration-on-registry-optional",
         "hypersign-edv-client": "git+https://github.com/hypersign-protocol/hypersign-edv-client.git#master",
         "ioredis": "^5.2.4",
+        "jsonwebtoken": "^9.0.0",
         "mongoose": "^5.12.3",
         "node-cron": "^3.0.2",
         "swagger-ui-express": "^4.1.6",

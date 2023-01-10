@@ -4,6 +4,7 @@ import hsJson from '../../hypersign.json';
 
 import userServices from '../services/userServices';
 import { IUserModel } from '../models/userModel';
+import { verifyJWT } from '../middleware/auth';
 
 export = (hypersign,edvClient) => {
     const router = Router();
@@ -16,7 +17,7 @@ export = (hypersign,edvClient) => {
   
   
 
-    router.post('/sync',/** middle were for wallet verification*/ async (req, res) => {
+    router.post('/sync',verifyJWT, async (req, res) => {
         try {
             const { user, document } = req.body
 
@@ -70,7 +71,7 @@ export = (hypersign,edvClient) => {
 
 
 
-    router.get('/sync/:userId',async (req, res) => {
+    router.get('/sync/:userId',verifyJWT,async (req, res) => {
         try {
 
             const {userId}=req.params
@@ -105,6 +106,14 @@ export = (hypersign,edvClient) => {
 
 
     })
+
+
+    router.post('/sync/verifytoken',verifyJWT,async(req,res)=>{
+        res.status(200).json({
+            verified:true
+        })
+    })
+
 
 
     return router;
