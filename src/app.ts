@@ -44,7 +44,7 @@ function corsOptionsDelegate(req, callback) {
 
 app.use(xss());
 app.use(cors(corsOptionsDelegate));
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '5mb' }));
 app.use(express.static('public'))
 
 // TODO:  this should go into hypersisgn auth sdk
