@@ -7,7 +7,6 @@
         "start": "NODE_ENV=production node dist/src/app.js",
         "prod": "NODE_ENV=production node dist/api.bundle.js",
         "dev": "NODE_ENV=production nodemon src/app.ts",
-        "test:edv": "NODE_ENV=production nodemon src/services/edvService.ts",
         "service:dev": "NODE_ENV=production nodemon src/services/processBatchTxn.ts",
         "service:start": "NODE_ENV=production node dist/src/services/processBatchTxn.js",
         "build": "rimraf dist && tsc -p . && cp -r public dist && cp production.env dist",

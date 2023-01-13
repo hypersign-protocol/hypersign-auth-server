@@ -1,5 +1,5 @@
 import express from 'express';
-import authRoutes from './routes/auth';
+import {auth as authRoutes ,edvRoutes} from './routes';
 import walletRoutes from './routes/wallet';
 import { PORT, baseUrl, whitelistedUrls, HIDNODE_RPC_URL, HIDNODE_REST_URL, HID_WALLET_MNEMONIC, EDV_DID_FILE_PATH, EDV_KEY_FILE_PATH, EDV_CONFIG_DIR, EDV_ID, EDV_BASE_URL } from './config';
 import xss from 'xss-clean';
@@ -11,7 +11,6 @@ import hsSSIdk from 'hs-ssi-sdk'
 import vpschema from './models/vp';
 import userServices from './services/userServices';
 import { IUserModel } from './models/userModel';
-import edvRoutes from './routes/edvRoutes';
 import { Bip39, EnglishMnemonic } from '@cosmjs/crypto'
 import { existDir, store, createDir } from './utils/file';
 import EncryptedDataVaultService from './services/edvService';
