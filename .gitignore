@@ -10,3 +10,4 @@ schema.json
 *.env
 hypersign.json
 
+.authserver-edv-config

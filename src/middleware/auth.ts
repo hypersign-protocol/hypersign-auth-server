@@ -1,30 +1,32 @@
 import fetch from 'node-fetch';
+import { sign, verify } from '../services/authTokenService';
+import { jwt } from '../config'
 
 import { auth0Tenant, logger } from '../config';
 // TODO move this in hypersign auth js node sdk
-export async function verifyAccessTokenForThridPartyAuth(req, res, next){
+export async function verifyAccessTokenForThridPartyAuth(req, res, next) {
     logger.info('Inside verifyAccessTokenForThridPartyAuth method')
     const { isThridPartyAuth } = req.body;
-    if(isThridPartyAuth === true){
+    if (isThridPartyAuth === true) {
         const { thridPartyAuthProvider, accessToken } = req.body;
-        if(thridPartyAuthProvider){
-            switch(thridPartyAuthProvider){
+        if (thridPartyAuthProvider) {
+            switch (thridPartyAuthProvider) {
                 case 'Google': {
                     const { user } = req.body;
-                    try{
+                    try {
                         const options = {
                             method: 'GET',
                             url: auth0Tenant + 'userinfo',
                             headers: { authorization: 'Bearer ' + accessToken }
                         };
-                        
+
                         const response = await fetch(options.url, {
                             method: options.method,
                             headers: options.headers
                         })
                         const userFromProvider = await response.json();
 
-                        if((userFromProvider.email === user.email) && userFromProvider.email_verified == true){
+                        if ((userFromProvider.email === user.email) && userFromProvider.email_verified == true) {
                             logger.info('Auth token successfully verified')
                             next();
                         } else {
@@ -35,8 +37,8 @@ export async function verifyAccessTokenForThridPartyAuth(req, res, next){
                                 error: 'Invalid accessToken',
                             })
                         }
-                    }catch(e){
-                        logger.error('Error =  '+ e.message)
+                    } catch (e) {
+                        logger.error('Error =  ' + e.message)
                         return res.status(401).send({
                             status: 401,
                             message: null,
@@ -66,4 +68,38 @@ export async function verifyAccessTokenForThridPartyAuth(req, res, next){
         logger.info('No isThridPartyAuth, going ahead')
         next()
     }
+}
+
+
+
+export async function verifyJWT(req, res, next) {
+    try {
+        const token = req.headers.authorization.split(' ')[1]
+
+        await verify(token, jwt.secret)
+
+
+        next()
+    } catch (error) {
+        res.status(401).send(error)
+    }
+
+
+}
+
+
+export async function issueJWT(req, res, next) {
+
+    const { user } = req.body
+
+    const payload = {
+        name: user.name,
+        email: user.email
+
+    }
+    const token = await sign(payload, jwt.secret, jwt.expiryTime)
+    req.body.authToken = token
+    next()
+
+
 }

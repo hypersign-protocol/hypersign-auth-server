@@ -18,6 +18,11 @@ class Configuration {
   private dbConnUrl: string;
   public whitelistedUrls: any;
   public auth0Tenant: string;
+  public jwt:{
+    "secret":'',
+    "expiryTime": 0
+
+  };
 
   public HIDNODE_RPC_URL: string;
   public HIDNODE_REST_URL: string;
@@ -32,6 +37,7 @@ class Configuration {
       Configuration.instace.setup();
       Configuration.instace.setupLogger();
       Configuration.instace.setupDb();
+      Configuration.instace.setupHypersign();
     }
     return Configuration.instace;
   }
@@ -81,6 +87,17 @@ class Configuration {
       dotenv.config();
     }
   }
+  private setupHypersign(){
+  const hypersignPath=path.resolve(__dirname,"../","hypersign"+".json")
+  
+  if(fs.existsSync(hypersignPath)){
+    const data=fs.readFileSync(hypersignPath)
+    const jwt=JSON.parse(data.toString()).jwt
+    this.jwt=jwt
+    
+        
+  }
+}
 
   private setupLogger() {
     const logDIR = path.join(this.dataDIR, "./log");
@@ -135,6 +152,7 @@ const {
   HIDNODE_RPC_URL,
   HIDNODE_REST_URL,
   HID_WALLET_MNEMONIC, 
+  jwt
   
 } = Configuration.getInstance();
 
@@ -146,4 +164,9 @@ const REDIS_HOST= process.env.REDIS_HOST || 'localhost'
 const REDIS_PORT=process.env.REDIS_PORT || '6379'
 const REDIS_PASSWORD=process.env.REDIS_PASSWORD || ''
 
-export {REDIS_HOST,REDIS_PORT,REDIS_PASSWORD, MAXIMUM_DELAY,MINIMUM_DELAY, MAX_BATCH_SIZE, db, NODE_ENV, HOST, PORT, baseUrl, logger, whitelistedUrls, auth0Tenant, HIDNODE_RPC_URL, HIDNODE_REST_URL, HID_WALLET_MNEMONIC }
+const EDV_DID_FILE_PATH=process.env.EDV_DID_FILE_PATH || 'edv/did.json'
+const EDV_KEY_FILE_PATH=process.env.EDV_KEY_FILE_PATH || 'edv/key.json'
+const EDV_CONFIG_DIR=process.env.EDV_CONFIG_DIR || 'edv'
+const EDV_ID=process.env.EDV_ID || 'did:example:123456789abcdefghi'
+const EDV_BASE_URL=process.env.EDV_BASE_URL || 'http://localhost:7777/encrypted-data-vaults'
+export {EDV_BASE_URL,EDV_ID,EDV_CONFIG_DIR,EDV_DID_FILE_PATH,EDV_KEY_FILE_PATH,REDIS_HOST,REDIS_PORT,REDIS_PASSWORD, MAXIMUM_DELAY,MINIMUM_DELAY, MAX_BATCH_SIZE, db, NODE_ENV, HOST, PORT, baseUrl, logger, whitelistedUrls, auth0Tenant, HIDNODE_RPC_URL, HIDNODE_REST_URL, HID_WALLET_MNEMONIC,jwt }

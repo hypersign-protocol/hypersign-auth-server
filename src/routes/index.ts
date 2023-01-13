@@ -1,6 +1,7 @@
 import auth from './auth';
-
-export default {
-    auth
+import edvRoutes from './edvRoutes';
+export  {
+    auth,
+    edvRoutes
 }
 

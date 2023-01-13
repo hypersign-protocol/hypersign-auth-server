@@ -1,8 +1,10 @@
 import { Router } from "express";
 import hsJson from '../../hypersign.json';
-import { verifyAccessTokenForThridPartyAuth } from '../middleware/auth';
+import { issueJWT, verifyAccessTokenForThridPartyAuth } from '../middleware/auth';
 import { registerSchemaBody } from "../middleware/registerSchema";
 import { validateRequestSchema } from "../middleware/validateRequestSchema";
+import { IUserModel } from '../models/userModel';
+import userServices from "../services/userServices";
 import { HIDNODE_REST_URL, REDIS_HOST,REDIS_PASSWORD,REDIS_PORT } from '../config'
 let c = 0
 
@@ -33,6 +35,48 @@ interface IHypersignAuth {
 
 }
 
+
+async function userExistsMiddleWare(req,res,next){
+    const userService=new userServices()
+    
+    
+    const {user,isisThridPartyAuth,thridPartyAuthProvider,authToken}=req.body
+    
+    const userData:IUserModel={
+      userId:user.email,
+      sequence:0,
+      docId:''
+    } as IUserModel
+    const record=await userService.userExists(userData.userId)
+
+    
+    if(record.exists){
+      const docId=record.user.docId
+
+      // User already exists
+      // get from edv 
+      const docData=await this.getDecryptedDocument(docId)
+
+      // decrypt
+      return res.status(403).send({
+        status: 403,
+        message: "User already exists",
+        error: null,
+        data: {
+          docId:record.user.docId,
+          sequence:record.user.sequence,
+          userId:record.user.userId
+
+          } as IUserModel,
+          authToken
+        },
+        
+      );
+    } 
+    next()
+  
+}
+
 function addExpirationDateMiddleware(req, res, next) {
   const now = new Date();
   // valid for 1 year
@@ -41,7 +85,7 @@ function addExpirationDateMiddleware(req, res, next) {
   next();
 }
 
-export = (hypersign: IHypersignAuth) => {
+export = (hypersign: IHypersignAuth,edvClient) => {
   const router = Router();
 
   router.get('/test', (req, res) => {
@@ -100,12 +144,13 @@ export = (hypersign: IHypersignAuth) => {
 
   // Implement /register API:
   // Analogous to register user but not yet activated
-  router.post("/register", verifyAccessTokenForThridPartyAuth, addExpirationDateMiddleware, hypersign.register.bind(hypersign), async (req, res) => {
+  router.post("/register", verifyAccessTokenForThridPartyAuth,issueJWT, userExistsMiddleWare.bind(edvClient),addExpirationDateMiddleware, hypersign.register.bind(hypersign), async (req, res) => {
     try {
       console.log("Register success");
       // You can store userdata (req.body) but this user is not yet activated since he has not
       // validated his email.
-
+      
+      const {authToken}=req.body
       if (req.body.hypersign.data.signedVC !== undefined) {        
           //  await queue.addJob({ data: { credentialStatus: req.body.hypersign.data.credentialStatus, proof: req.body.hypersign.data.proof } })
           //  await redis.rpush('vc-txn', JSON.stringify( {
@@ -127,6 +172,7 @@ export = (hypersign: IHypersignAuth) => {
             status: 200,
             message: req.body.hypersign.data.signedVC,
             error: null,
+            authToken,
           });
       }
 
@@ -137,6 +183,8 @@ export = (hypersign: IHypersignAuth) => {
             status: 200,
             message: req.body.hypersign.data,
             error: null,
+            authToken,
+
           });
       }
       return res.status(200).send({ status: 200, message: "A QR code has been sent to emailId you provided. Kindly scan the QR code with Hypersign Identity Wallet to receive Hypersign Auth Credential.", error: null });
