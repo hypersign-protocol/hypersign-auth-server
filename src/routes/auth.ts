@@ -40,7 +40,7 @@ async function userExistsMiddleWare(req,res,next){
     const userService=new userServices()
     
     
-    const {user,isisThridPartyAuth,thridPartyAuthProvider,authToken}=req.body
+    const {user,isisThridPartyAuth,thridPartyAuthProvider,authToken,forgetPassword}=req.body
     
     const userData:IUserModel={
       userId:user.email,
@@ -50,7 +50,7 @@ async function userExistsMiddleWare(req,res,next){
     const record=await userService.userExists(userData.userId)
 
     
-    if(record.exists){
+    if(record.exists && (forgetPassword!=="true") ){
       const docId=record.user.docId
 
       // User already exists
