@@ -16,4 +16,4 @@ const user = new Schema({
 
 
 
-export default mongoose.model<IUserModel>('userModelEdvMetaData', user)
+export default mongoose.model<IUserModel>('user', user)
