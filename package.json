@@ -29,7 +29,7 @@
         "helmet": "^4.4.1",
         "hid-hd-wallet": "https://github.com/hypersign-protocol/hid-hd-wallet#ssi-integration",
         "hs-ssi-sdk": "https://github.com/hypersign-protocol/hid-ssi-js-sdk#credential-revocation",
-        "hypersign-auth-node-sdk": "file:../hypersign-auth-node-sdk",
+        "hypersign-auth-node-sdk": "https://github.com/hypersign-protocol/hypersign-auth-node-sdk#registration-on-registry-optional",
         "hypersign-edv-client": "git+https://github.com/hypersign-protocol/hypersign-edv-client.git#master",
         "ioredis": "^5.2.4",
         "jsonwebtoken": "^9.0.0",
