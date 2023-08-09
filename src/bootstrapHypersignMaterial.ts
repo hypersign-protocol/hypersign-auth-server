@@ -366,7 +366,8 @@ class BootStrap{
         "privateKeyBase58": this.hsCryptoMaterial.privateKeyMultibase
       },
       schemaId: this.authServerSchemaId,
-      networkUrl: this.networkUrl,
+      networkUrl: process.env.HIDNODE_RPC_URL,
+      networkRestUrl: process.env.HIDNODE_REST_URL,
       mail: {
         host: "",
         port: 0,
@@ -378,7 +379,9 @@ class BootStrap{
         secret: "",
         expiryTime: 0,
       },
-      appCredential: {}
+      appCredential: {},
+      namespace: process.env.NAMESPACE || "testnet",
+      verifyResourcePath: "/"
     }
 
     Object.assign(hypersignJSON, advance);
