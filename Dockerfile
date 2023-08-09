@@ -1,16 +1,10 @@
-FROM node:current-alpine3.13
-
-RUN mkdir -p /usr/src/app/dist
+FROM node:16.20.1
 WORKDIR /usr/src/app
+COPY ./package.json .
+COPY ./tsconfig.json .
+COPY ./hypersign.json .
 
-# copy bundled code base
-COPY dist/api.bundle.js dist
+RUN npm install
 
-# copy env var
-COPY production.env .
-
-# env 
-ENV NODE_ENV=production
-
-# command to run when the image is initiated
-CMD ["node", "dist/api.bundle.js"]
+COPY . .
+CMD ["npm", "run","dev"]
