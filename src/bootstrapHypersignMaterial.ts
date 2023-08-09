@@ -191,6 +191,7 @@ class BootStrap{
         "subscriptionId",
         "planId",
         "planName",
+        "verifyResourcePath"
       ],
       DESCRIPTION:
         process.env.APP_SCEHMA_DESCRIPTION ||
@@ -369,19 +370,18 @@ class BootStrap{
       networkUrl: process.env.HIDNODE_RPC_URL,
       networkRestUrl: process.env.HIDNODE_REST_URL,
       mail: {
-        host: "",
-        port: 0,
-        user: "",
-        pass: "",
-        name: ""
+        host: process.env.MAIL_HOST || "hypermine.in",
+        port: process.env.MAIL_PORT? parseInt(process.env.MAIL_PORT) : 465,
+        user: process.env.MAIL_USER || "someuser",
+        pass: process.env.MAIL_PASS || "",
+        name: process.env.MAIL_NAME || "somename"
       },
       jwt: {
         secret: "",
         expiryTime: 0,
       },
       appCredential: {},
-      namespace: process.env.NAMESPACE || "testnet",
-      verifyResourcePath: "/"
+      namespace: process.env.NAMESPACE || "testnet"
     }
 
     Object.assign(hypersignJSON, advance);
@@ -444,6 +444,7 @@ class BootStrap{
       subscriptionId: "dummy_id",
       planId: "dummy_id",
       planName: "dummy_id",
+      verifyResourcePath: ""
     };
 
     console.log({attributesMap: attributesMap})
