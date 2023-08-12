@@ -7,13 +7,12 @@ import HIDWallet from 'hid-hd-wallet';
 import { Bip39, EnglishMnemonic } from '@cosmjs/crypto'
 
 
-
  const walletOptions = {
         hidNodeRPCUrl: process.env.HIDNODE_RPC_URL,
         hidNodeRestUrl: process.env.HIDNODE_REST_URL
       };
 
-
+console.log(walletOptions)
 
 class HypersignWallet {
   private walletInstance:any;
@@ -327,6 +326,7 @@ class BootStrap{
     console.log('-----------before calling generateHypersignJson -----------------------')
     await this.generateHypersignJson(config.basic, config.advance, true);
     console.log('Done')
+    process.exit();
 
   }
 
@@ -412,7 +412,7 @@ class BootStrap{
     Object.assign(hypersignJSON.appCredential, signedCredential);
 
     hypersignJSON["isSubcriptionEnabled"] = false;
-    console.log(hypersignJSON)
+    console.log(JSON.stringify(hypersignJSON))
     
     await store(hypersignJSON, this.bootstrapConfig.hypersignFilePath);
   }
