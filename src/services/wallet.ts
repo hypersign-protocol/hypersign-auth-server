@@ -1,8 +1,8 @@
 import HIDWallet from 'hid-hd-wallet'
 import hsSsiSdk from 'hs-ssi-sdk'
-import {HIDNODE_REST_URL, HIDNODE_RPC_URL} from '../config'
+import {HIDNODE_REST_URL, HIDNODE_RPC_URL, HID_WALLET_MNEMONIC} from '../config'
 let hsSdk;
-const HID_WALLET_MNEMONIC = "sword comic lunar chalk runway evolve brand jungle glare opera submit promote defense unveil require yellow night hidden pupil setup fringe avocado ginger champion"
+// const HID_WALLET_MNEMONIC = "sword comic lunar chalk runway evolve brand jungle glare opera submit promote defense unveil require yellow night hidden pupil setup fringe avocado ginger champion"
 
 
 const walletOptions = {
