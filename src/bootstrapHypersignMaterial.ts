@@ -3,6 +3,78 @@ import HypersignSsiSDK from "hs-ssi-sdk";
 import { store } from './utils/file';
 import dotenv from "dotenv";
 import fs from 'fs';
+import HIDWallet from 'hid-hd-wallet';
+import { Bip39, EnglishMnemonic } from '@cosmjs/crypto'
+
+
+
+ const walletOptions = {
+        hidNodeRPCUrl: process.env.HIDNODE_RPC_URL,
+        hidNodeRestUrl: process.env.HIDNODE_REST_URL
+      };
+
+
+
+class HypersignWallet {
+  private walletInstance:any;
+  offlineSigner:any;
+  private menemonic:string
+  constructor(mnemonic:string){
+    this.walletInstance = new HIDWallet(walletOptions);
+    this.menemonic = mnemonic;
+    this.offlineSigner = null;
+  }
+
+  async init(){
+    await this.walletInstance.generateWallet({ mnemonic: this.menemonic })
+    this.offlineSigner = this.walletInstance.offlineSigner;
+  }
+
+  async getAccounts(){
+    if(!this.offlineSigner){
+      throw new Error('HIDWallet is not initialized')
+    }
+    return await this.offlineSigner.getAccounts();
+  }
+}
+
+
+interface IKeys {
+  privateKeyMultibase: string;
+  publicKeyMultibase:string;
+  
+}
+
+
+// {
+//   "publicKey": {
+//       "@context": "https://w3id.org/security/v2",
+//       "id": "did:hid:testnet:z8uyZoEA2JTCMWfadrSPaqyWmwzwc3qAwAM4snVrfLKue",
+//       "type": "Ed25519VerificationKey2018",
+//       "publicKeyBase58": "z6MkqKwdcpajzu3dyANeRDhHNEEMKZHbVsx1mc9hsn8DuFie"
+//   },
+//   "privateKeyBase58": "zrv3aFJvb6YKMXE24VjoZBr9viRhpGW9BmCW8VJrZs1VWqVu9jMFU2Qd2Mx3EPrEnCzNvaqz8xUpjQPcTJ5k3mgh5AW"
+// }
+interface IDidRegister {
+  did: string;
+  didDocument: object;
+  txresult: object;
+}
+
+interface ISchemaProof {
+  type: string;
+  verificationMethod: string;
+  proofPurpose: string;
+  proofValue: string;
+  created: string;
+}
+
+interface IDID{
+  did: string;
+  didDocument: object;
+  verificationMethodId: string;
+}
+
 
 class BootStrap{
     public hypersignSdk: any;
@@ -14,12 +86,15 @@ class BootStrap{
     public serviceEndpoint: string;
     public authServerSchemaId: string;
     public appSchemaId: string;
-    public hsCryptoMaterial: any;
+    public hsCryptoMaterial: IKeys;
     public appCredentialExpiresInDays: number;
     public NODE_ENV: string;
     public authServerName: string;
 
+    public issuerDID: IDID;
+    
     constructor(){
+      this.issuerDID = {} as IDID;
         this.setupEnvVar();
         this.setupHypersignConfig();
         
@@ -54,10 +129,11 @@ class BootStrap{
 
 
   private async setupHypersignConfig() {
-    this.networkUrl = process.env.NODE_SERVER_BASE_URL || "https://ssi.hypermine.in/core/";
-    this.hypersignSdk = new HypersignSsiSDK({ nodeUrl: this.networkUrl });
 
-    
+    const hidWallet = new HypersignWallet(process.env.HID_WALLET_MNEMONIC)
+    await hidWallet.init();
+    this.hypersignSdk = new HypersignSsiSDK(hidWallet.offlineSigner, process.env.HIDNODE_RPC_URL, process.env.HIDNODE_REST_URL, 'testnet')
+    await this.hypersignSdk.init();
 
     this.serviceEndpoint = process.env.SERVICE_END_POINT;
     this.bootstrapConfig = {
@@ -65,15 +141,17 @@ class BootStrap{
     }
 
 
-    console.log({
-        nodeEnv: this.NODE_ENV,
-        networkURl: this.networkUrl,
-        spEp: this.serviceEndpoint,
-        bootConfig : this.bootstrapConfig
-    })
+
+    const mnemonic_EnglishMnemonic: EnglishMnemonic = process.env.HID_WALLET_MNEMONIC as unknown as EnglishMnemonic
+    const seedEntropy = Bip39.decode(mnemonic_EnglishMnemonic)
 
 
-    this.hsCryptoMaterial = await this.registerDid();
+    this.hsCryptoMaterial = await this.hypersignSdk.did.generateKeys({ seed: seedEntropy} )
+    const  result: IDidRegister = await this.registerDid();
+    this.issuerDID.did = result.did;
+    this.issuerDID.didDocument = result.didDocument;
+    this.issuerDID.verificationMethodId = result.didDocument['verificationMethod'][0].id
+
     this.authServerName = process.env.AUTH_SERVER_NAME || "Hypersign Auth Credential"
 
 
@@ -91,7 +169,7 @@ class BootStrap{
 
     let schemaData = {
       name: this.hs_schema.APP_NAME,
-      author: this.hsCryptoMaterial.did,
+      author: this.issuerDID.did,
       description: this.hs_schema.DESCRIPTION,
       attributes: this.hs_schema.ATTRIBUTES as Array<string>,
       storeSchema: false
@@ -113,6 +191,7 @@ class BootStrap{
         "subscriptionId",
         "planId",
         "planName",
+        "verifyResourcePath"
       ],
       DESCRIPTION:
         process.env.APP_SCEHMA_DESCRIPTION ||
@@ -121,7 +200,7 @@ class BootStrap{
     
     const appSchemaData = {
       name: this.hs_app_schema.APP_NAME,
-      author: this.hsCryptoMaterial.did,
+      author: this.issuerDID.did,
       description: this.hs_app_schema.DESCRIPTION,
       attributes: this.hs_app_schema.ATTRIBUTES as Array<string>,
       storeSchema: false
@@ -136,6 +215,7 @@ class BootStrap{
 
     this.appCredentialExpiresInDays =  process.env.APP_CREDENTIAL_EXPIRATION_DAYS ? parseInt(process.env.APP_CREDENTIAL_EXPIRATION_DAYS) : 60 ;
 
+    console.log('BEfore calling bootstrap()');
     await this.bootstrap();
 
 
@@ -149,7 +229,7 @@ class BootStrap{
       name,
       author,
       description,
-      properties: {}
+      fields: []
     };
 
     if (!attributes || attributes.length <= 0) {
@@ -157,34 +237,75 @@ class BootStrap{
     }
 
     (attributes as Array<string>).forEach(element => {
-      schemaData.properties[element] = ""
+      schemaData.fields.push({
+        name: element,
+        type: 'string',
+        isRequired: true
+      })
     });
 
-    const schemaGenerated = await this.hypersignSdk.schema.generateSchema(schemaData);
+    const schemaGenerated = await this.hypersignSdk.schema.getSchema(schemaData);
     console.log(schemaGenerated)
-    const r = await this.hypersignSdk.schema.registerSchema(schemaGenerated);
 
-    return r["schemaId"];
+
+    const resolvedSchema = await this.hypersignSdk.schema.resolve({ schemaId: schemaGenerated.id })
+    if(resolvedSchema){
+      console.log(resolvedSchema)
+      console.log('Schema id ' + schemaGenerated.id +  ' is already created')
+      return schemaGenerated.id;
+    }
+
+
+    const signature =await this.hypersignSdk.schema.signSchema({ privateKey: this.hsCryptoMaterial.privateKeyMultibase, schema: schemaGenerated })
+    console.log(signature)
+
+
+    
+    
+    const proof: ISchemaProof = {
+      proofValue: signature,
+      created: schemaGenerated.authored,
+      type: "Ed25519Signature2020",
+      verificationMethod : this.issuerDID.verificationMethodId,
+      proofPurpose: "assertion"
+    }
+    const r = await this.hypersignSdk.schema.registerSchema({ schema: schemaGenerated, proof });
+
+    console.log(r)
+    return schemaGenerated.id;
   }
 
   // Register DID
-  private async registerDid() {
+  private async registerDid():  Promise<IDidRegister> {
     console.log("Register did...inside")
 
-    const resp = await this.hypersignSdk.did.getDid({
-      user: {
-        name: this.authServerName
+
+
+    const didDocument = await this.hypersignSdk.did.generate({ publicKeyMultibase: this.hsCryptoMaterial.publicKeyMultibase })
+    didDocument.keyAgreement = []
+    
+
+    const didResolved = await this.hypersignSdk.did.resolve({ did: didDocument.id, ed25519verificationkey2020: true})
+    if(didResolved){
+      console.log(didResolved.didDocument)
+      console.log('Did was already created')
+      return {
+        did: didDocument.id,
+        didDocument: didResolved.didDocument, 
+        txresult: null
       }
-    });
+    } 
 
-    const { did, keys, didDoc } = resp;
-    await this.hypersignSdk.did.register(didDoc);
-
+    const result = await this.hypersignSdk.did.register({ didDocument: didDocument , privateKeyMultibase: this.hsCryptoMaterial.privateKeyMultibase, verificationMethodId: didDocument['verificationMethod'][0].id  })
+    
+    console.log(result)
+    
     console.log("Regiter finished")
 
     return {
-      did,
-      keys
+      did: didDocument.id,
+      didDocument: didDocument, 
+      txresult: result
     };
   }
 
@@ -195,7 +316,7 @@ class BootStrap{
         name: this.hs_schema.APP_NAME,
         description: this.hs_schema.DESCRIPTION,
         serviceEndpoint: this.serviceEndpoint,
-        did: this.hsCryptoMaterial.did,
+        did: this.issuerDID.did,
         logoUrl: ""
       },
       advance: {}
@@ -212,9 +333,8 @@ class BootStrap{
   async generateHypersignJson(basic = {}, advance = {}, storeHypersign = false) {
 
     console.log('Inside generateHypersignJson ...')
-    const {did: ownerDid, keys}  =  this.hsCryptoMaterial;
+    const ownerDid = this.issuerDID.did;
 
-    console.log(this.hsCryptoMaterial)
 
     const tempApp = {
       name: this.hs_schema.APP_NAME,
@@ -224,36 +344,56 @@ class BootStrap{
 
     console.log(tempApp)
 
+    // {
+//   "publicKey": {
+//       "@context": "https://w3id.org/security/v2",
+//       "id": "did:hid:testnet:z8uyZoEA2JTCMWfadrSPaqyWmwzwc3qAwAM4snVrfLKue",
+//       "type": "Ed25519VerificationKey2018",
+//       "publicKeyBase58": "z6MkqKwdcpajzu3dyANeRDhHNEEMKZHbVsx1mc9hsn8DuFie"
+//   },
+//   "privateKeyBase58": "zrv3aFJvb6YKMXE24VjoZBr9viRhpGW9BmCW8VJrZs1VWqVu9jMFU2Qd2Mx3EPrEnCzNvaqz8xUpjQPcTJ5k3mgh5AW"
+// }
+
+
+
     let hypersignJSON = {
-      keys: {},
+      keys: {
+          "publicKey": {
+              "@context": "https://w3id.org/security/v2",
+              "id": this.issuerDID.did,
+              "type": "Ed25519VerificationKey2018",
+              "publicKeyBase58": this.hsCryptoMaterial.publicKeyMultibase
+          },
+        "privateKeyBase58": this.hsCryptoMaterial.privateKeyMultibase
+      },
       schemaId: this.authServerSchemaId,
-      networkUrl: this.networkUrl,
+      networkUrl: process.env.HIDNODE_RPC_URL,
+      networkRestUrl: process.env.HIDNODE_REST_URL,
       mail: {
-        host: "",
-        port: 0,
-        user: "",
-        pass: "",
-        name: ""
+        host: process.env.MAIL_HOST || "hypermine.in",
+        port: process.env.MAIL_PORT? parseInt(process.env.MAIL_PORT) : 465,
+        user: process.env.MAIL_USER || "someuser",
+        pass: process.env.MAIL_PASS || "",
+        name: process.env.MAIL_NAME || "somename"
       },
       jwt: {
         secret: "",
         expiryTime: 0,
       },
-      appCredential: {}
+      appCredential: {},
+      namespace: process.env.NAMESPACE || "testnet"
     }
 
     Object.assign(hypersignJSON, advance);
     Object.assign(tempApp, { ...basic });
     tempApp["owner"] = ownerDid;
-
-    Object.assign(hypersignJSON.keys, keys);
     tempApp["did"] = ownerDid;
 
 
     console.log(tempApp)
 
     // In case jwt configuration is not set by developer.
-    if (hypersignJSON.jwt.secret == "") hypersignJSON.jwt.secret = this.hypersignSdk.did.getChallange();
+    if (hypersignJSON.jwt.secret == "") hypersignJSON.jwt.secret = 'VeryBadSecret1@###!@#!@#!@#!';
     if (hypersignJSON.jwt.expiryTime == 0) hypersignJSON.jwt.expiryTime = 120000
 
     // step2: Store app realated configuration in db
@@ -272,7 +412,7 @@ class BootStrap{
     Object.assign(hypersignJSON.appCredential, signedCredential);
 
     hypersignJSON["isSubcriptionEnabled"] = false;
-console.log(hypersignJSON)
+    console.log(hypersignJSON)
     
     await store(hypersignJSON, this.bootstrapConfig.hypersignFilePath);
   }
@@ -289,9 +429,9 @@ console.log(hypersignJSON)
     console.log('inside getCreandeit l ----------------- ')
     console.log(app)
     console.log('inside getCreandeit l ----------------- ')
-    const schemaUrl = `${this.networkUrl}api/v1/schema/${this.appSchemaId}`;
-    console.log({schemaUrl: schemaUrl})
-    const {keys: issuerKeys} = this.hsCryptoMaterial;
+
+
+
 
     // TODO: need to do this in better way..more dynamic way.
     // make use of SCHEMA.attributes
@@ -304,40 +444,26 @@ console.log(hypersignJSON)
       subscriptionId: "dummy_id",
       planId: "dummy_id",
       planName: "dummy_id",
+      verifyResourcePath: ""
     };
 
     console.log({attributesMap: attributesMap})
-    console.log( schemaUrl,
-        {
-          subjectDid: app.did,
-          issuerDid: issuerKeys.publicKey.id,
-          expirationDate: this.addDays(new Date(), this.appCredentialExpiresInDays), 
-          attributesMap,
-        })
 
         console.log('------------------- befoe calling  generateCredential ---------------------')
-    const credential = await this.hypersignSdk.credential.generateCredential(
-      schemaUrl,
-      {
-        subjectDid: app.did,
-        issuerDid: issuerKeys.publicKey.id,
-        expirationDate: this.addDays(new Date(), this.appCredentialExpiresInDays), 
-        attributesMap,
-      }
-    );
+
+       const credential =  await this.hypersignSdk.vc.getCredential({
+          schemaId: this.appSchemaId,
+          subjectDid: this.issuerDID.did,
+          issuerDid: this.issuerDID.did,
+          expirationDate: this.addDays(new Date(), this.appCredentialExpiresInDays),
+          fields: attributesMap
+        })
+    
 
     console.log({credential})
 
-    console.log('------------------- befoe calling  signCredential ---------------------')
-
-    const signedCredential = await this.hypersignSdk.credential.signCredential(
-      credential,
-      issuerKeys.publicKey.id,
-      issuerKeys.privateKeyBase58
-    );
-
-    console.log({signedCredential})
-    return signedCredential;
+    
+    return credential;
   }
 }
 
