@@ -48,15 +48,25 @@ class Configuration {
     this.LOG_LEVEL = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : "info";
     this.NODE_ENV = process.env.NODE_ENV ? process.env.NODE_ENV : "development";
     this.dbConnUrl = process.env.DB_URL && process.env.DB_URL != "" ? process.env.DB_URL : null;
+    if(!this.dbConnUrl){
+      throw new Error('HS-AUTH-SERVER: Error: DB_URL must be set in env')
+    }
     this.baseUrl = "http://" + this.HOST + ":" + this.PORT;
     this.whitelistedUrls = process.env.WHITELISTED_CORS ? process.env.WHITELISTED_CORS : ['*'];
 
     this.auth0Tenant = process.env.AUTH0TENANT ? process.env.AUTH0TENANT : "https://fidato.us.auth0.com/";
-    this.HIDNODE_RPC_URL = process.env.HIDNODE_RPC_URL ? process.env.HIDNODE_RPC_URL : "http://localhost:26657";
-    this.HIDNODE_REST_URL = process.env.HIDNODE_REST_URL ? process.env.HIDNODE_REST_URL : "http://localhost:1317";
+    this.HIDNODE_RPC_URL = process.env.HIDNODE_RPC_URL;
+    this.HIDNODE_REST_URL = process.env.HIDNODE_REST_URL;
 
     this.HID_WALLET_MNEMONIC = process.env.HID_WALLET_MNEMONIC;
 
+    if(!this.HIDNODE_RPC_URL){
+      throw new Error('HS-AUTH-SERVER: Error: HIDNODE_RPC_URL must be set in env')
+    }
+
+    if(!this.HIDNODE_REST_URL){
+      throw new Error('HS-AUTH-SERVER: Error: HIDNODE_REST_URL must be set in env')
+    }
 
     if (!this.HID_WALLET_MNEMONIC) {
       throw new Error('HS-AUTH-SERVER: Error: mnemonic must be set in ENV for hid wallet creation')
@@ -76,8 +86,6 @@ class Configuration {
       "../",
       process.env.NODE_ENV + ".env"
     );
-
-    console.log(envPath);
 
     if (fs.existsSync(envPath)) {
       dotenv.config({
