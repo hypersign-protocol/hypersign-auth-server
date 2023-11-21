@@ -1,5 +1,5 @@
 import HIDWallet from 'hid-hd-wallet'
-import hsSsiSdk from 'hs-ssi-sdk'
+import { HypersignSSISdk } from 'hs-ssi-sdk';
 import {HIDNODE_REST_URL, HIDNODE_RPC_URL, HID_WALLET_MNEMONIC} from '../config'
 let hsSdk;
 // const HID_WALLET_MNEMONIC = "sword comic lunar chalk runway evolve brand jungle glare opera submit promote defense unveil require yellow night hidden pupil setup fringe avocado ginger champion"
@@ -19,8 +19,12 @@ const hidWalletInstance = new HIDWallet(walletOptions);
 async function init() {
     await hidWalletInstance.generateWallet({ mnemonic: HID_WALLET_MNEMONIC })
     console.log("hidWalletInstance", hidWalletInstance);
-    
-    hsSdk = new hsSsiSdk(hidWalletInstance.offlineSigner, walletOptions.hidNodeRPCUrl, walletOptions.hidNodeRestUrl, 'testnet');
+    hsSdk = new HypersignSSISdk({
+        offlineSigner: hidWalletInstance.offlineSigner,
+        nodeRpcEndpoint: walletOptions.hidNodeRPCUrl,
+        nodeRestEndpoint: walletOptions.hidNodeRestUrl,
+        namespace: 'testnet',
+      });
      await hsSdk.init();
         return hsSdk;
     }

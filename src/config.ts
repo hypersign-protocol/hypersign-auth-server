@@ -42,12 +42,21 @@ class Configuration {
     return Configuration.instace;
   }
 
+  private checkUrl(url: string) {
+    // TODO: check if the url is a valid url
+    if (url.charAt(url.length - 1) === '/') {
+      return url;
+    } else {
+      return (url = url + '/');
+    }
+  }
   private setup() {
     this.HOST = process.env.HOST ? process.env.HOST : "localhost";
     this.PORT = process.env.PORT ? process.env.PORT : "3003";
     this.LOG_LEVEL = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : "info";
     this.NODE_ENV = process.env.NODE_ENV ? process.env.NODE_ENV : "development";
-    this.dbConnUrl = process.env.DB_URL && process.env.DB_URL != "" ? process.env.DB_URL : null;
+    this.dbConnUrl = process.env.DB_URL || "mongodb://localhost:27017/auth-server" ;
+    console.log('Setup this.dbConnUrl '  + this.dbConnUrl)
     if(!this.dbConnUrl){
       throw new Error('HS-AUTH-SERVER: Error: DB_URL must be set in env')
     }
@@ -55,8 +64,8 @@ class Configuration {
     this.whitelistedUrls = process.env.WHITELISTED_CORS ? process.env.WHITELISTED_CORS : ['*'];
 
     this.auth0Tenant = process.env.AUTH0TENANT ? process.env.AUTH0TENANT : "https://fidato.us.auth0.com/";
-    this.HIDNODE_RPC_URL = process.env.HIDNODE_RPC_URL;
-    this.HIDNODE_REST_URL = process.env.HIDNODE_REST_URL;
+    this.HIDNODE_RPC_URL = this.checkUrl(process.env.HIDNODE_RPC_URL);
+    this.HIDNODE_REST_URL = this.checkUrl(process.env.HIDNODE_REST_URL);
 
     this.HID_WALLET_MNEMONIC = process.env.HID_WALLET_MNEMONIC;
 
@@ -139,6 +148,7 @@ class Configuration {
   }
 
   private async setupDb() {
+    console.log(this.dbConnUrl)
     if (this.dbConnUrl) {
       await mongoose.connect(this.dbConnUrl,
         { useNewUrlParser: true, useUnifiedTopology: true })

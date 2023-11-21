@@ -110,7 +110,7 @@ export = (hypersign: IHypersignAuth,edvClient) => {
       const vcData = await vc.json()
           
 
-      if (vcData.message?.includes('credentialStatus document not found')) {
+      if (vcData.message?.includes(`credential status document ${vcId} not found`)) {
         let result = await redis.call('ft.search', 'idx:vc-txn-err', vcId.split(":")[3])
         
         const key= result[1]
@@ -144,14 +144,14 @@ export = (hypersign: IHypersignAuth,edvClient) => {
 
   // Implement /register API:
   // Analogous to register user but not yet activated
-  router.post("/register", verifyAccessTokenForThridPartyAuth,issueJWT, userExistsMiddleWare.bind(edvClient),addExpirationDateMiddleware, hypersign.register.bind(hypersign), async (req, res) => {
+  router.post("/register", verifyAccessTokenForThridPartyAuth,issueJWT, userExistsMiddleWare.bind(edvClient), addExpirationDateMiddleware, hypersign.register.bind(hypersign), async (req, res) => {
     try {
       console.log("Register success");
       // You can store userdata (req.body) but this user is not yet activated since he has not
       // validated his email.
       
       const {authToken}=req.body
-  if (req.body.hypersign.data.signedCredential !== undefined) {        
+      if (req.body.hypersign.data.signedCredential !== undefined) {        
           //  await queue.addJob({ data: { credentialStatus: req.body.hypersign.data.credentialStatus, proof: req.body.hypersign.data.proof } })
           //  await redis.rpush('vc-txn', JSON.stringify( {
           //     proof: req.body.hypersign.data.proof,

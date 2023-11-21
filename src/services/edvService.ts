@@ -1,10 +1,14 @@
 
 //@ts-ignore
 import { HypersignEdvClient, HypersignCipher } from 'hypersign-edv-client';
+import { HypersignEdvClientEd25519VerificationKey2020 } from 'hypersign-edv-client';
 
 import { X25519KeyAgreementKey2020 } from '@digitalbazaar/x25519-key-agreement-key-2020';
 import { Ed25519VerificationKey2020 } from '@digitalbazaar/ed25519-verification-key-2020';
-
+import {
+    IResponse,
+    IEncryptionRecipents,
+  } from 'hypersign-edv-client/build/Types';
 import { EDV_DID_FILE_PATH, EDV_KEY_FILE_PATH, logger } from '../config'
 import fs from 'fs'
 interface IEd25519VerificationKey2020KeyPair {
@@ -13,9 +17,20 @@ interface IEd25519VerificationKey2020KeyPair {
 
 }
 
+
+type EDVDocType = {
+    document: object;
+    documentId?: string;
+    sequence?: number;
+    metadata?: object;
+    edvId: string;
+    recipients?: Array<IEncryptionRecipents>;
+    indexs?: Array<{ index: string; unique: boolean }>;
+  };
+
 export default class EncryptedDataVaultService {
   
-    private edvClient: HypersignEdvClient;
+    private edvClient: any;
     private cipher: HypersignCipher;
     private edvId: string;
     private edvKey: string;
@@ -33,6 +48,9 @@ export default class EncryptedDataVaultService {
     private edvCapabilityInvocationKeyPrivateKeyMultibase: string;
     private edvCapabilityInvocationKeyPublicKeyJwk: string;
     private edvCapabilityInvocationKeyPrivateKeyJwk: string;
+    private x25519Signer: X25519KeyAgreementKey2020
+
+    private recipient: any;
 
 
     public async setAuthenticationKey(Ed25519VerificationKey2020KeyPair: IEd25519VerificationKey2020KeyPair, authenticationKeyId: string, controller: string) {
@@ -110,42 +128,100 @@ export default class EncryptedDataVaultService {
             edvId: this.edvId,
 
         }
-        const client = new HypersignEdvClient({
+
+        
+
+        this.x25519Signer = await X25519KeyAgreementKey2020.fromEd25519VerificationKey2020({
+        keyPair: {
+          publicKeyMultibase: this.edvAuthnticationKey.publicKeyMultibase,
+          privateKeyMultibase: this.edvAuthnticationKey.privateKeyMultibase,
+        },
+      });
+
+      this.recipient = [
+        {
+          ...config.keyAgreementKey,
+          publicKeyMultibase: this.x25519Signer.publicKeyMultibase,
+        },
+      ];
+
+        const client = new HypersignEdvClientEd25519VerificationKey2020({
             keyResolver: this.hypersignDIDKeyResolverForEd25519KeyPair,
             url: this.edvUrl,
             ed25519VerificationKey2020: this.edvAuthnticationKey,
-        })
+            x25519KeyAgreementKey2020: this.x25519Signer,
+        });
+      
+        // new HypersignEdvClient({
+        //     keyResolver: this.hypersignDIDKeyResolverForEd25519KeyPair,
+        //     url: this.edvUrl,
+        //     ed25519VerificationKey2020: this.edvAuthnticationKey,
+        // })
+
         const data = await client.registerEdv(config);
         this.edvClient = client;
 
         logger.info('EDV Service Initialized')
     }
 
-    public async createDocument(doc: Object) {
-        const { edvClient, edvId } = this;
-        const  resp = await edvClient.insertDoc({ document: doc, edvId });
-        return resp;
+
+    public prepareEdvDocument(
+        content: object,
+        indexes?: Array<{ index: string; unique: boolean }>,
+        recipients?: Array<IEncryptionRecipents>,
+      ): EDVDocType {
+        const document: any = {
+          document: { content },
+          edvId: this.edvId,
+          indexs: indexes,
+          recipients: recipients ? recipients : this.recipient,
+        };
+        return document;
     }
 
-    public async updateDocument(doc: Object, id: string) {
+    public async createDocument(doc: EDVDocType): Promise<{ id: string }>{
+        const { edvClient, edvId } = this;
+        if (doc['recipients'] && doc['recipients'].length === 0) {    
+            doc['recipients'] = this.recipient;
+        }
+        const resp: IResponse = await edvClient.insertDoc({ ...doc });
+        return {
+            id: resp.document.id,
+        };
+    }
+
+    public async updateDocument(doc: EDVDocType, id: string) {
         const { edvClient, edvId } = this;
         return await edvClient.updateDoc({ document: doc, edvId, documentId: id });
     }
 
-    public async getDocument(id: string) {
+    public async getDocument(id: string):  Promise<IResponse> {
         const { edvClient, edvId } = this;
-        return await edvClient.fetchDoc({ edvId, documentId: id });
+        // return await edvClient.fetchDoc({ edvId, documentId: id });
+
+        const resp: IResponse = await edvClient.fetchDoc({
+            edvId: edvId,
+            documentId: id,
+        });
+        return resp;
     }
 
-    public async getDecryptedDocument(id: string) {
+    public async getDecryptedDocument(id: string) : Promise<any>{
         const { edvClient, edvId } = this;
-        const doc = await edvClient.fetchDoc({ edvId, documentId: id });
+        // const doc = await edvClient.fetchDoc({ edvId, documentId: id });
+        const doc: IResponse = await this.getDocument(id);
+        if (!doc.document) {
+          throw new Error(doc.message);
+        }
 
-        const decryptedDoc = await edvClient.hsCipher.decryptObject({ jwe: JSON.parse(doc[0].encData) })
-        return decryptedDoc
+        const { content } = await  edvClient.decryptObject({
+            keyAgreementKey: this.x25519Signer,
+            jwe: doc.document.jwe,
+        });
+        return content;
+        // const decryptedDoc = await edvClient.hsCipher.decryptObject({ jwe: JSON.parse(doc[0].encData) })
+        // return decryptedDoc
     }
-
-
 
 }
 

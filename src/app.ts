@@ -7,7 +7,7 @@ import cors from 'cors';
 import HypersignAuth from 'hypersign-auth-node-sdk';
 import http from 'http';
 import HIDWallet from 'hid-hd-wallet';
-import hsSSIdk from 'hs-ssi-sdk'
+import { HypersignSSISdk } from 'hs-ssi-sdk';
 import vpschema from './models/vp';
 import userServices from './services/userServices';
 import { IUserModel } from './models/userModel';
@@ -75,7 +75,15 @@ hidWalletInstance.generateWallet({ mnemonic: HID_WALLET_MNEMONIC }).then(async (
   hidWalletInstance.offlineSigner.getAccounts().then(console.log)
 
   const hypersign: IHypersignAuth = (new HypersignAuth(server, hidWalletInstance.offlineSigner)) as IHypersignAuth
-  const hsSSIdkInstance = new hsSSIdk(hidWalletInstance.offlineSigner, HIDNODE_RPC_URL, HIDNODE_REST_URL, 'testnet')
+  // const hsSSIdkInstance = new hsSSIdk(hidWalletInstance.offlineSigner, HIDNODE_RPC_URL, HIDNODE_REST_URL, 'testnet')
+
+  const hsSSIdkInstance = new HypersignSSISdk({
+    offlineSigner: hidWalletInstance.offlineSigner,
+    nodeRpcEndpoint: HIDNODE_RPC_URL,
+    nodeRestEndpoint: HIDNODE_REST_URL,
+    namespace: 'testnet',
+  });
+
   await hsSSIdkInstance.init();
   await hypersign.init();
   const mnemonic_EnglishMnemonic: EnglishMnemonic = HID_WALLET_MNEMONIC as unknown as EnglishMnemonic
@@ -126,7 +134,8 @@ hidWalletInstance.generateWallet({ mnemonic: HID_WALLET_MNEMONIC }).then(async (
       // console.log(challenge);
       const issuerVerificationMethodId = vp.verifiableCredential[0].proof.verificationMethod
       const holderVerificationMethodId = vp.proof.verificationMethod
-      const result = await hsSSIdkInstance.vp.verifyPresentation({
+      type vpResult = {verified: boolean, results: Array<any>} 
+      const result: vpResult = await hsSSIdkInstance.vp.verify({
         signedPresentation: vp,
         challenge,
         issuerDid,
@@ -134,7 +143,7 @@ hidWalletInstance.generateWallet({ mnemonic: HID_WALLET_MNEMONIC }).then(async (
         holderVerificationMethodId,
         issuerVerificationMethodId
 
-      });
+      }) as vpResult;
       if (result.verified) {
 
         const record = await vpschema.create({ vp });

@@ -6,7 +6,7 @@ import userServices from '../services/userServices';
 import { IUserModel } from '../models/userModel';
 import { verifyJWT } from '../middleware/auth';
 
-export = (hypersign,edvClient) => {
+export = (hypersign, edvClient) => {
     const router = Router();
     const userService = new userServices()
     // console.log(await edv.createDocument({'data':'Pratap'}))
@@ -36,7 +36,8 @@ export = (hypersign,edvClient) => {
 
                 //update document in edv
                 //get sequence number from edv and document id from edv
-                const edvResp=await edvClient.updateDocument(document,userData.docId)
+                const edvDocument = edvClient.prepareEdvDocument(document)
+                const edvResp=await edvClient.updateDocument(edvDocument, userData.docId)
                 userData.sequence=edvResp.sequence
                 userData.docId=edvResp.id
                 // reencrypt and update to edv
@@ -50,7 +51,8 @@ export = (hypersign,edvClient) => {
                 // reencrypt and add document to edv
                 //get sequence number from edv and document id from edv
 
-                const edvResp=await edvClient.createDocument(document)
+                const edvDocument = edvClient.prepareEdvDocument(document)
+                const edvResp=await edvClient.createDocument(edvDocument)
                         
                 
                 userData.sequence=edvResp.sequence
