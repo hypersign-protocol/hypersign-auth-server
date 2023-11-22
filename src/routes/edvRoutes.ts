@@ -72,7 +72,7 @@ export = (hypersign, edvClient) => {
                 throw new Error('More than one entry found for this user in the edv, id' +  userData.userId)
             }
 
-            const userDocId =  userDataInEdv[0]['id'] ;
+            const userDocId =  userDataInEdv[0] ? userDataInEdv[0]['id'] : undefined ;
 
             console.log('edvRoutest:: sync(): After checking if user exists with doc id ' + userDocId)
             
@@ -82,7 +82,7 @@ export = (hypersign, edvClient) => {
                     encryptedMessage: document.encryptedMessage,
                     userId: userData.userId
                 }
-                console.log('edvRoutest:: sync(): Preparing documet to insert in edv, doc ' + JSON.stringify(userEdvDoc))
+                console.log('edvRoutest:: sync(): Preparing documet to insert in edv, doc ')
                 const edvDocument = edvClient.prepareEdvDocument(userEdvDoc, [{ index: 'content.userId', unique: true }])
                 console.log('edvRoutest:: sync(): Before updating the db with docid  ' + userDocId)
                 const edvResp = await edvClient.updateDocument(edvDocument, userDocId)

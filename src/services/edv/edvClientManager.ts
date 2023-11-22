@@ -114,7 +114,7 @@ export class EdvClientManger implements IEdvClientManager {
 
   async updateDocument(doc: EDVDocType, id: string): Promise<{ id: string }> {
     const { edvId } = this;
-    const resp: IResponse = await this.vault.updateDoc({ document: doc, edvId, documentId: id })
+    const resp: IResponse = await this.vault.updateDoc({ ...doc, documentId: id })
     return {
       id: resp.document.id
     }
