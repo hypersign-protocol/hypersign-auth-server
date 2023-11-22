@@ -36,7 +36,7 @@ class Configuration {
       Configuration.instace.setupEnvVar();
       Configuration.instace.setup();
       Configuration.instace.setupLogger();
-      Configuration.instace.setupDb();
+      // Configuration.instace.setupDb();
       Configuration.instace.setupHypersign();
     }
     return Configuration.instace;
@@ -56,10 +56,10 @@ class Configuration {
     this.LOG_LEVEL = process.env.LOG_LEVEL ? process.env.LOG_LEVEL : "info";
     this.NODE_ENV = process.env.NODE_ENV ? process.env.NODE_ENV : "development";
     this.dbConnUrl = process.env.DB_URL || "mongodb://localhost:27017/auth-server" ;
-    console.log('Setup this.dbConnUrl '  + this.dbConnUrl)
-    if(!this.dbConnUrl){
-      throw new Error('HS-AUTH-SERVER: Error: DB_URL must be set in env')
-    }
+    // console.log('Setup this.dbConnUrl '  + this.dbConnUrl)
+    // if(!this.dbConnUrl){
+    //   throw new Error('HS-AUTH-SERVER: Error: DB_URL must be set in env')
+    // }
     this.baseUrl = "http://" + this.HOST + ":" + this.PORT;
     this.whitelistedUrls = process.env.WHITELISTED_CORS ? process.env.WHITELISTED_CORS : ['*'];
 

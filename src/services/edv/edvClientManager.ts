@@ -96,25 +96,23 @@ export class EdvClientManger implements IEdvClientManager {
   }
 
   async createDocument(doc: EDVDocType): Promise<{ id: string }> {
-    
-    console.log('edvClientManager:: createDocument() ')
     if (doc['recipients'].length == 0) {
       doc['recipients'] = this.recipient;
     } 
-
     const resp: IResponse = await this.vault.insertDoc({ ...doc });
-    // if(resp && resp.statusCode === 400){
-
-    // }
-
+    if(resp && resp['statusCode'] && resp['statusCode'] === 500){
+      throw new Error(JSON.stringify(resp['message']))
+    }
     return {
-      id: resp.document.id,
+      id: resp?.document.id,
     };
   }
 
   async updateDocument(doc: EDVDocType, id: string): Promise<{ id: string }> {
-    const { edvId } = this;
     const resp: IResponse = await this.vault.updateDoc({ ...doc, documentId: id })
+    if(resp && resp['statusCode'] && resp['statusCode'] === 500){
+      throw new Error(JSON.stringify(resp['message']))
+    }
     return {
       id: resp.document.id
     }
