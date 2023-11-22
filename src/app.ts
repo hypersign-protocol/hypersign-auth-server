@@ -15,6 +15,8 @@ import { Bip39, EnglishMnemonic } from '@cosmjs/crypto'
 import { existDir, store, createDir } from './utils/file';
 import EncryptedDataVaultService from './services/edvService';
 import  mongoose  from 'mongoose';
+import { EdvClientKeysManager } from './services/edv/edv.singleton';
+import { VaultWalletManager } from './services/edv/vaultWalletManager';
 mongoose.set('useCreateIndex', true);
 
 const app = express();
@@ -86,7 +88,8 @@ hidWalletInstance.generateWallet({ mnemonic: HID_WALLET_MNEMONIC }).then(async (
 
   await hsSSIdkInstance.init();
   await hypersign.init();
-  const mnemonic_EnglishMnemonic: EnglishMnemonic = HID_WALLET_MNEMONIC as unknown as EnglishMnemonic
+  
+  const mnemonic_EnglishMnemonic: EnglishMnemonic = HID_WALLET_MNEMONIC as unknown as EnglishMnemonic;
   const seedEntropy = Bip39.decode(mnemonic_EnglishMnemonic)
   const keys = await hsSSIdkInstance.did.generateKeys({ seed: seedEntropy })
   const edvDid = await hsSSIdkInstance.did.generate({ publicKeyMultibase: keys.publicKeyMultibase })
@@ -100,14 +103,24 @@ hidWalletInstance.generateWallet({ mnemonic: HID_WALLET_MNEMONIC }).then(async (
   if (!existDir(EDV_KEY_FILE_PATH)) {
     store(keys, EDV_KEY_FILE_PATH)
   }
-  const edv = new EncryptedDataVaultService(EDV_BASE_URL,EDV_ID)
-  await edv.setAuthenticationKey(keys,edvDid.authentication[0],edvDid.controller[0])
-  await edv.init()
+  
+  
+  
+  const kmsVaultWallet = await VaultWalletManager.getWallet(
+    mnemonic_EnglishMnemonic,
+    hsSSIdkInstance
+  );
+  const kmsVaultManager = new EdvClientKeysManager();
+  const kmsVault = await kmsVaultManager.createVault(kmsVaultWallet, EDV_ID, EDV_BASE_URL);
+  
+  // const edv = new EncryptedDataVaultService(EDV_BASE_URL,EDV_ID)
+  // await edv.setAuthenticationKey(keys,edvDid.authentication[0],edvDid.controller[0])
+  // await edv.init()
 
   
-  app.use('/hs/api/v2', authRoutes(hypersign,edv));
+  app.use('/hs/api/v2', authRoutes(hypersign, kmsVault));
   app.use('/hs/api/v2', walletRoutes(hidWalletInstance));
-  app.use('/hs/api/v2', edvRoutes(hypersign,edv))
+  app.use('/hs/api/v2', edvRoutes(hypersign, kmsVault))
   app.get('/shared/vp/:id', async (req, res) => {
     try {
 
