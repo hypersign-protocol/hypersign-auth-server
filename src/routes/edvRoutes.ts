@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { IUserModel } from '../models/userModel';
 import { verifyJWT } from '../middleware/auth';
+import userServices from '../services/userServices';
 
 export = (hypersign, edvClient) => {
     const router = Router();
-    // const userService = new userServices()
+    const userService = new userServices()
     
     function getUserData(docId, userData){
         return {
@@ -91,46 +92,46 @@ export = (hypersign, edvClient) => {
     })
 
 
-    // router.get('/sync/:userId',verifyJWT,async (req, res) => {
-    //     try {
+    router.get('/sync/:userId',verifyJWT,async (req, res) => {
+        try {
 
-    //         const {userId}=req.params
+            const {userId}=req.params
     
-    //         const record = await userService.userExists(userId)
+            const record = await userService.userExists(userId)
 
 
-    //         const userDocInEdv  = await getUserDocIdIfUserExists(userId)
-    //         const { userDocId } = userDocInEdv;
+            const userDocInEdv  = await getUserDocIdIfUserExists(userId)
+            const { userDocId } = userDocInEdv;
 
-    //         let userData={} as IUserModel
+            let userData={} as IUserModel
             
 
-    //         if(record.exists){
+            if(record.exists){
                 
-    //             userData.sequence=record.user.sequence
-    //             userData.docId=record.user.docId
+                userData.sequence=record.user.sequence
+                userData.docId=record.user.docId
     
-    //             const edvResp=await edvClient.getDecryptedDocument(userData.docId)
+                const edvResp=await edvClient.getDecryptedDocument(userData.docId)
     
-    //             res.status(200).json(
-    //                 edvResp
-    //             )
+                res.status(200).json(
+                    edvResp
+                )
     
     
-    //         }else{
-    //             res.status(500).json({
-    //                 message:"User not found."
-    //             })
-    //         }
-    //     } catch (error) {
-    //         res.status(500).json({
-    //             error
-    //         })
-    //     }
+            }else{
+                res.status(500).json({
+                    message:"User not found."
+                })
+            }
+        } catch (error) {
+            res.status(500).json({
+                error
+            })
+        }
        
 
 
-    // })
+    })
 
     router.post('/sync/verifytoken',verifyJWT,async(req,res)=>{
         res.status(200).json({
