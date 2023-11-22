@@ -100,7 +100,7 @@ hidWalletInstance.generateWallet({ mnemonic: HID_WALLET_MNEMONIC }).then(async (
   if (!existDir(EDV_KEY_FILE_PATH)) {
     store(keys, EDV_KEY_FILE_PATH)
   }
-  const edv=new EncryptedDataVaultService(EDV_BASE_URL,EDV_ID)
+  const edv = new EncryptedDataVaultService(EDV_BASE_URL,EDV_ID)
   await edv.setAuthenticationKey(keys,edvDid.authentication[0],edvDid.controller[0])
   await edv.init()
 

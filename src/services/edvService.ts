@@ -54,7 +54,6 @@ export default class EncryptedDataVaultService {
 
 
     public async setAuthenticationKey(Ed25519VerificationKey2020KeyPair: IEd25519VerificationKey2020KeyPair, authenticationKeyId: string, controller: string) {
-
         const key = {
             id: authenticationKeyId.split('#')[0] + '#' + Ed25519VerificationKey2020KeyPair.publicKeyMultibase,
             controller: controller,
@@ -71,9 +70,9 @@ export default class EncryptedDataVaultService {
         this.edvCapabilityInvocationKeyPrivateKeyMultibase = Ed25519VerificationKey2020KeyPair.privateKeyMultibase;
         this.edvCapabilityInvocationKeyController = controller;
         this.edvCapabilityInvocationKeyID = key.id;
-
-
     }
+
+
     constructor(edvURL, edvId) {
         this.edvUrl = edvURL;
         this.edvId = edvId;
@@ -158,12 +157,23 @@ export default class EncryptedDataVaultService {
         //     ed25519VerificationKey2020: this.edvAuthnticationKey,
         // })
 
-        const data = await client.registerEdv(config);
+
+        const config1 = {
+            url: this.edvUrl,
+            keyAgreementKey: config.keyAgreementKey,
+            controller: config.controller,
+            edvId: this.edvId,
+          };
+        const data = await client.registerEdv(config1);
         this.edvClient = client;
 
         logger.info('EDV Service Initialized')
     }
 
+
+    get EdvClient(){
+        return this.edvClient
+    }
 
     public prepareEdvDocument(
         content: object,
@@ -180,9 +190,12 @@ export default class EncryptedDataVaultService {
     }
 
     public async createDocument(doc: EDVDocType): Promise<{ id: string }>{
-        const { edvClient, edvId } = this;
-        if (doc['recipients'] && doc['recipients'].length === 0) {    
-            doc['recipients'] = this.recipient;
+        console.log('EDVClient:  createDocument () ..')
+        const { edvClient } = this;
+        console.log(this.recipient)
+        doc['recipients'] = this.recipient;
+        if (doc['recipients'].length == 0) {    
+            console.log('EDVClient:   doc.recipients' +  doc['recipients'])
         }
         const resp: IResponse = await edvClient.insertDoc({ ...doc });
         return {
