@@ -192,10 +192,7 @@ export = (hypersign: IHypersignAuth,edvClient) => {
       // validated his email.
       
       const {authToken}=req.body
-
       console.log('Inside /register :: Before calling if(req.body.hypersign.data.signedCredential')
-      console.log(JSON.stringify(req.body.hypersign, null, 2))
-
       if (req.body.hypersign.data.signedCredential !== undefined) {            
         console.log('Inside /register :: Before pushing into redis...vc-txn')
         await redis.rpush('vc-txn', JSON.stringify({ txn: req.body.hypersign.data.txn, vcId: req.body.hypersign.data.signedCredential.id }))
