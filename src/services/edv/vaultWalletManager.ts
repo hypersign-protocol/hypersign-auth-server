@@ -28,8 +28,33 @@ export class VaultWallet {
     this.hsSSIdkInstance = hsSSIdkInstance;
   }
 
-  async Initialize() {
+
+  private _getSeedEntropy() {
     const seedEntropy = Bip39.decode(this.mnemonic);
+    return seedEntropy
+}
+
+private _getAuthenticationKey(controller, publicKeyMultibase, privateKeyMultibase) {
+    return {
+        '@context': 'https://w3id.org/security/suites/ed25519-2020/v1',
+        id: controller.split('#')[0] + '#' + publicKeyMultibase,
+        controller,
+        publicKeyMultibase,
+        privateKeyMultibase,
+    }
+}
+
+private _getKeyAgreementKey(controller, publicKeyMultibase, privateKeyMultibase) {
+    return {
+        id: controller.split('#')[0] + '#' + publicKeyMultibase,
+        type: 'X25519KeyAgreementKey2020',
+        publicKeyMultibase,
+        privateKeyMultibase,
+    }
+}
+
+  async Initialize() {
+    const seedEntropy = this._getSeedEntropy();
 
     this.keys = await this.hsSSIdkInstance.did.generateKeys({
       seed: seedEntropy,
@@ -39,31 +64,23 @@ export class VaultWallet {
       publicKeyMultibase: this.keys.publicKeyMultibase,
     });
 
-    this.authenticationKey = {
-      '@context': 'https://w3id.org/security/suites/ed25519-2020/v1',
-      id:
-        this.didDocument.id.split('#')[0] + '#' + this.keys.publicKeyMultibase,
-      controller: this.didDocument.id,
-      publicKeyMultibase: this.keys.publicKeyMultibase,
-      privateKeyMultibase: this.keys.privateKeyMultibase,
-    };
+    this.authenticationKey = this._getAuthenticationKey(this.didDocument.id, this.keys.publicKeyMultibase, this.keys.privateKeyMultibase) 
+
 
     this.ed25519Signer = await Ed25519VerificationKey2020.from(
       this.authenticationKey,
     );
 
-    this.x25519Signer =
-      await X25519KeyAgreementKey2020.fromEd25519VerificationKey2020({
-        keyPair: {
-          publicKeyMultibase: this.keys.publicKeyMultibase,
-          privateKeyMultibase: this.keys.privateKeyMultibase,
-        },
-      });
 
-    this.x25519Signer.id =
-      this.didDocument.id.split('#')[0] +
-      '#' +
-      this.x25519Signer.publicKeyMultibase;
+      this.x25519Signer = await X25519KeyAgreementKey2020.fromEd25519VerificationKey2020({
+        keyPair: {
+            publicKeyMultibase: this.keys.publicKeyMultibase,
+            privateKeyMultibase: this.keys.privateKeyMultibase,
+        },
+    })
+    this.x25519Signer.id =  this.didDocument.id.split('#')[0] + '#' + this.x25519Signer.publicKeyMultibase;
+
+      // console.log(this.x25519Signer && JSON.stringify(this.x25519Signer))
 
     // TODO: confued between x25519Signer & keyAgreementKey
     this.keyAgreementKey = {

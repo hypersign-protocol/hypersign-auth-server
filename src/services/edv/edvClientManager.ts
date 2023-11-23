@@ -135,10 +135,16 @@ export class EdvClientManger implements IEdvClientManager {
     if (!doc.document) {
       throw new Error(doc.message);
     }
-    const { content } = await this.vault.decryptObject({
-      keyAgreementKey: this.vaultWallet.x25519Signer,
-      jwe: doc.document.jwe,
-    });
+      let decryptedObject;
+      decryptedObject = await this.vault.decryptObject({
+        keyAgreementKey: this.vaultWallet.x25519Signer,
+        jwe: doc.document.jwe,
+      });  
+
+    if(!decryptedObject){
+      throw new Error('Unable to decrypt document for id ' + id);
+    }
+    const { content }  = decryptedObject
     return content;
   }
 

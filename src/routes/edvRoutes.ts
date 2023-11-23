@@ -15,28 +15,47 @@ export = (hypersign, edvClient) => {
         } as IUserModel
     }
 
-    async function  getUserDocIdIfUserExists(userId){
-        const equals : { [key: string]: string } = {
-            ['content.userId']: userId
-        }
-        const userDataInEdv: Array<any>  = await edvClient.query(equals)
-        if(!(Array.isArray(userDataInEdv))){
-            if(userDataInEdv['statusCode'] === 500){
-                throw new Error('Error: '  + JSON.stringify(userDataInEdv['message']))
+    async function  getUserDocIdIfUserExists(userId, getRawData: boolean = false){
+        try{
+
+            let data = null
+            const equals : { [key: string]: string } = {
+                ['content.userId']: userId
             }
-            throw new Error('Error: Could not query vault for this user id ' + userId)
-        }  
+            const userDataInEdv: Array<any>  = await edvClient.query(equals)
+            if(!(Array.isArray(userDataInEdv))){
+                if(userDataInEdv['statusCode'] === 500){
+                    throw new Error('Error: '  + (userDataInEdv['message'] && JSON.stringify(userDataInEdv['message'])))
+                }
+                throw new Error('Error: Could not query vault for this user id ' + userId)
+            }  
+            if(userDataInEdv.length > 1){
+                // This error should not come when bug in edv is fixed related to unique index one. 
+                throw new Error('More than one entry found for this user in the edv, id' +  userId)
+            }
 
-        if(userDataInEdv.length > 1){
-            // This error should not come when bug in edv is fixed related to unique index one. 
-            throw new Error('More than one entry found for this user in the edv, id' +  userId)
-        }
+            const userDocId =  userDataInEdv[0] ? userDataInEdv[0]['id'] : undefined ;
+            if(!userDocId){
+                console.log('edvRoutes:: getUserDocIdIfUserExists(): No document found for this docid'  + userDocId)
+                throw new Error('No document found for this docid' +  userDocId)
+            } 
+            if(getRawData){
+                data = await edvClient.getDecryptedDocument(userDocId)
+            }
 
-        const userDocId =  userDataInEdv[0] ? userDataInEdv[0]['id'] : undefined ;
-        return {
-            success: true,
-            userDocId
+            return {
+                success: true,
+                userDocId,
+                data
+            }
+
+        }catch(e){
+            console.log(e)
+                return {
+                    success: false 
+                }
         }
+        
     }
 
 
@@ -63,6 +82,9 @@ export = (hypersign, edvClient) => {
                     encryptedMessage: document.encryptedMessage,
                     userId: userData.userId
                 }
+
+                console.log('EncMessage ' + userEdvDoc.encryptedMessage)
+
                 console.log('edvRoutest:: sync(): Preparing documet to insert in edv, doc ')
                 const edvDocument = edvClient.prepareEdvDocument(userEdvDoc, [{ index: 'content.userId', unique: true }])
                 console.log('edvRoutest:: sync(): Before updating the db with docid  ' + userDocId)
@@ -92,46 +114,27 @@ export = (hypersign, edvClient) => {
     })
 
 
-    // router.get('/sync/:userId',verifyJWT,async (req, res) => {
-    //     try {
+    router.get('/sync/:userId',verifyJWT,async (req, res) => {
+        try {
+            const {userId}=req.params
+            const userDocInEdv  = await getUserDocIdIfUserExists(userId, true)
 
-    //         const {userId}=req.params
-    
-    //         const record = await userService.userExists(userId)
+            console.log(userDocInEdv)
 
-
-    //         const userDocInEdv  = await getUserDocIdIfUserExists(userId)
-    //         const { userDocId } = userDocInEdv;
-
-    //         let userData={} as IUserModel
-            
-
-    //         if(record.exists){
-                
-    //             userData.sequence=record.user.sequence
-    //             userData.docId=record.user.docId
-    
-    //             const edvResp=await edvClient.getDecryptedDocument(userData.docId)
-    
-    //             res.status(200).json(
-    //                 edvResp
-    //             )
-    
-    
-    //         }else{
-    //             res.status(500).json({
-    //                 message:"User not found."
-    //             })
-    //         }
-    //     } catch (error) {
-    //         res.status(500).json({
-    //             error
-    //         })
-    //     }
-       
-
-
-    // })
+            if(userDocInEdv.success && userDocInEdv.userDocId && userDocInEdv.data){
+                console.log('All good, sending response ' )
+                return res.status(200).json(
+                    userDocInEdv.data
+                )
+            } else {
+                throw new Error("User data not found, userId " + userId)
+            }
+        } catch (error) {
+            res.status(500).json({
+                error
+            })
+        }
+    })
 
     router.post('/sync/verifytoken',verifyJWT,async(req,res)=>{
         res.status(200).json({

@@ -36,46 +36,8 @@ interface IHypersignAuth {
 }
 
 
-async function userExistsMiddleWare(req,res,next){
-    const userService=new userServices()
-    
-    
-    const {user,isisThridPartyAuth,thridPartyAuthProvider,authToken,forgetPassword}=req.body
-    
-    const userData:IUserModel={
-      userId:user.email,
-      sequence:0,
-      docId:''
-    } as IUserModel
-    const record=await userService.userExists(userData.userId)
 
-    
-    if(record.exists && (forgetPassword!=="true") ){
-      const docId=record.user.docId
 
-      // User already exists
-      // get from edv 
-      const docData=await this.getDecryptedDocument(docId)
-
-      // decrypt
-      return res.status(403).send({
-        status: 403,
-        message: "User already exists",
-        error: null,
-        data: {
-          docId:record.user.docId,
-          sequence:record.user.sequence,
-          userId:record.user.userId
-
-          } as IUserModel,
-          authToken
-        },
-        
-      );
-    } 
-    next()
-  
-}
 
 function addExpirationDateMiddleware(req, res, next) {
   const now = new Date();
@@ -87,6 +49,85 @@ function addExpirationDateMiddleware(req, res, next) {
 
 export = (hypersign: IHypersignAuth,edvClient) => {
   const router = Router();
+  
+
+
+  async function  getUserDocIdIfUserExists(userId){
+    try{
+      console.log('authRoutes:: getUserDocIdIfUserExists(): starts')
+        const equals : { [key: string]: string } = {
+            ['content.userId']: userId
+        }
+        console.log('authRoutes:: getUserDocIdIfUserExists(): Before quering edvClient for userID ' + userId)
+        const userDataInEdv: Array<any>  = await edvClient.query(equals)
+        if(!(Array.isArray(userDataInEdv))){
+            if(userDataInEdv['statusCode'] === 500){
+                console.log(JSON.stringify(userDataInEdv['message']))
+                throw new Error('Error: something went wrong')
+            }
+            throw new Error('Error: Could not query vault for this user id ' + userId)
+        }  
+
+        if(userDataInEdv.length === 0){
+          throw new Error('No record found for user, id' +  userId)
+        }
+      
+        if(userDataInEdv.length > 1){
+            // This error should not come when bug in edv is fixed related to unique index one. 
+            throw new Error('More than one entry found for this user in the edv, id' +  userId)
+        }
+      
+        const userDocId =  userDataInEdv[0] ? userDataInEdv[0]['id'] : undefined ;
+        return {
+            success: true,
+            userDocId
+        }
+
+    }catch(e){
+      console.log(e)
+      return {
+        success: false 
+      }
+    }
+    
+  }
+
+  async function userExistsMiddleWare(req,res,next){
+    const userService=new userServices()
+    
+    
+    const {user,isisThridPartyAuth,thridPartyAuthProvider,authToken,forgetPassword}=req.body
+    
+    const userData:IUserModel={
+      userId:user.email,
+      sequence:0,
+      docId:''
+    } as IUserModel
+
+    console.log('auth:: userExistsMiddleWare() : BEfore checking if user already exists')
+    const userDocInEdv  = await getUserDocIdIfUserExists(userData.userId)    
+    
+    console.log('auth:: userExistsMiddleWare() : After checking if user already exists, status ' + userDocInEdv.success)
+    if(userDocInEdv.success && (forgetPassword!=="true") ){
+      const docId=userDocInEdv.userDocId
+      // decrypt
+      return res.status(403).send({
+        status: 403,
+        message: "User already exists",
+        error: null,
+        data: {
+          docId:docId,
+          sequence:0,
+          userId:userData.userId
+          } as IUserModel,
+          authToken
+        },
+        
+      );
+    } 
+    next()
+  
+}
 
   router.get('/test', (req, res) => {
     res.send("Hello")
