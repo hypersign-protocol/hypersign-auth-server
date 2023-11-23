@@ -9,11 +9,8 @@ import http from 'http';
 import HIDWallet from 'hid-hd-wallet';
 import { HypersignSSISdk } from 'hs-ssi-sdk';
 import vpschema from './models/vp';
-import userServices from './services/userServices';
-import { IUserModel } from './models/userModel';
 import { Bip39, EnglishMnemonic } from '@cosmjs/crypto'
 import { existDir, store, createDir } from './utils/file';
-import EncryptedDataVaultService from './services/edvService';
 import  mongoose  from 'mongoose';
 import { EdvClientKeysManager } from './services/edv/edv.singleton';
 import { VaultWalletManager } from './services/edv/vaultWalletManager';
@@ -182,33 +179,6 @@ hidWalletInstance.generateWallet({ mnemonic: HID_WALLET_MNEMONIC }).then(async (
 
 
   })
-
-
-  // app.post('/user',async (req,res)=>{
-  //   try {
-
-  // const userData:IUserModel = {
-  //   userId: 'test',
-  //     sequence: 1,
-  //     docId: 'testabc'    
-
-  // } as IUserModel;
-  //     const userService = new userServices();
-  //     // const records = await userService.createUser(userData);
-  //     const records = await userService.updateUser('test',userData)
-
-  //     const record = await userService.userExists('test');
-  //      res.status(200).json({
-  //         record
-  //       })
-  //   } catch (error) {
-  //     res.status(500).json({
-  //       status:'error',
-  //       message:error.message
-  //     })
-  //   }
-
-  // })
 
 })
   .catch(e => {

@@ -1,12 +1,9 @@
 import { Router } from 'express';
 import { IUserModel } from '../models/userModel';
 import { verifyJWT } from '../middleware/auth';
-import userServices from '../services/userServices';
 
 export = (hypersign, edvClient) => {
     const router = Router();
-    const userService = new userServices()
-    
     function getUserData(docId, userData){
         return {
             userId: userData.userId,

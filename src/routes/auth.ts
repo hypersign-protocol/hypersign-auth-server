@@ -4,7 +4,6 @@ import { issueJWT, verifyAccessTokenForThridPartyAuth } from '../middleware/auth
 import { registerSchemaBody } from "../middleware/registerSchema";
 import { validateRequestSchema } from "../middleware/validateRequestSchema";
 import { IUserModel } from '../models/userModel';
-import userServices from "../services/userServices";
 import { HIDNODE_REST_URL, REDIS_HOST,REDIS_PASSWORD,REDIS_PORT } from '../config'
 let c = 0
 
@@ -93,11 +92,7 @@ export = (hypersign: IHypersignAuth,edvClient) => {
   }
 
   async function userExistsMiddleWare(req,res,next){
-    const userService=new userServices()
-    
-    
     const {user,isisThridPartyAuth,thridPartyAuthProvider,authToken,forgetPassword}=req.body
-    
     const userData:IUserModel={
       userId:user.email,
       sequence:0,
