@@ -12,7 +12,7 @@
         "build": "rimraf dist && tsc -p . && cp -r public dist && cp production.env dist",
         "lint": "eslint . --ext .ts",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "bootstrap": "NODE_ENV=production ts-node src/bootstrapHypersignMaterial.ts"
+        "bootstrap": "NODE_ENV=production ts-node src/bootStrapHypersignIssuer.ts"
     },
     "author": "Vishwas Anand Bhushan",
     "license": "MIT",
@@ -28,8 +28,8 @@
         "express-validator": "^6.12.2",
         "helmet": "^4.4.1",
         "hid-hd-wallet": "https://github.com/hypersign-protocol/hid-hd-wallet#ssi-integration",
-        "hs-ssi-sdk": "^7.0.1",
-        "hypersign-auth-node-sdk": "^6.4.4",
+        "hs-ssi-sdk": "/Users/hermit/code/hm/hs/hid-ssi-js-sdk",
+        "hypersign-auth-node-sdk": "file:../hypersign-auth-node-sdk",
         "hypersign-edv-client": "github:hypersign-protocol/hypersign-edv-client#develop",
         "ioredis": "^5.2.4",
         "jsonwebtoken": "^9.0.0",
