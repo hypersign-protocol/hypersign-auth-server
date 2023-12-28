@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: auth-server
-          image: __GOOGLE_ARTIFACT_URL__/__GOOGLE_PROJECT_ID__/__GOOGLE_ARTIFACT_REPO__/auth-server:latest
+          image: __GOOGLE_ARTIFACT_URL__/__GOOGLE_PROJECT_ID__/__GOOGLE_ARTIFACT_REPO__/auth-server:1
           imagePullPolicy: Always 
           volumeMounts: 
             - mountPath: "/usr/src/app"
