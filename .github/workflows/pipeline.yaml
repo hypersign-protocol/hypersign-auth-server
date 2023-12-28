@@ -30,6 +30,8 @@ jobs:
 
       - name: "Docker Auth"
         run: gcloud auth configure-docker ${{secrets.GOOGLE_ARTIFACT_URL}}
+      - name: "Get Hypersign json"
+        run: echo ${{ secrets.HYPERSIGN_JSON}}  >> hypersign.json
       - name: "Docker Build and Push"
         env:
           GOOGLE_PROJECT_ID: ${{secrets.GOOGLE_PROJECT_ID}}
@@ -98,7 +100,7 @@ jobs:
       - name: "Replace Secrets"
         run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__MAX_BATCH_SIZE__#${{ secrets.MAX_BATCH_SIZE }}#" {} \;
       - name: "Replace Secrets"
-        run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__DB_URL__#${{ secrets.DB_URL }}#" {} \;
+        run: find .deploy/deployment.yaml -type f -exec sed  -i -e "s#__DB_URL__#${{ secrets.DB_URL }}#" {} \;
       - name: "Replace Secrets"
         run: find .deploy/deployment.yaml -type f -exec sed  -i "s#__MINIMUM_DELAY__#${{ secrets.MINIMUM_DELAY }}#" {} \;
       - name: "Replace Secrets"

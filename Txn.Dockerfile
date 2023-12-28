@@ -7,7 +7,9 @@ COPY ./tsconfig.json .
 RUN npm install
 
 COPY . .
-CMD [ "npm","run","build", "&&",   "npm", "run","service:start"]
+RUN npm run build
+
+CMD [    "npm", "run","service:start"]
 
 
 
