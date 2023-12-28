@@ -39,13 +39,13 @@ jobs:
           GOOGLE_ARTIFACT_REPO: ${{secrets.GOOGLE_ARTIFACT_REPO}}
           HYPERSIGN_JSON: ${{secrets.HYPERSIGN_JSON}}
         run:
-          docker build -t $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server:1 .
+          docker build -t $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server:2 .
 
-          docker push  $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server:1
+          docker push  $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server:2
 
-          docker build -t $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server-txn:1  . -f Txn.Dockerfile
+          docker build -t $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server-txn:2  . -f Txn.Dockerfile
 
-          docker push $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server-txn:1
+          docker push $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server-txn:2
 
   Deploy-Pipeline:
     needs: [Build-Pipeline]
