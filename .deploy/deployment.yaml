@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: auth-server
-          image: __GOOGLE_ARTIFACT_URL__/__GOOGLE_PROJECT_ID__/__GOOGLE_ARTIFACT_REPO__/auth-server:1
+          image: __GOOGLE_ARTIFACT_URL__/__GOOGLE_PROJECT_ID__/__GOOGLE_ARTIFACT_REPO__/auth-server:2
           imagePullPolicy: Always
           volumeMounts:
             - mountPath: "/data"
@@ -112,7 +112,7 @@ spec:
     spec:
       containers:
         - name: auth-server-txn
-          image: __GOOGLE_ARTIFACT_URL__/__GOOGLE_PROJECT_ID__/__GOOGLE_ARTIFACT_REPO__/auth-server-txn:latest
+          image: __GOOGLE_ARTIFACT_URL__/__GOOGLE_PROJECT_ID__/__GOOGLE_ARTIFACT_REPO__/auth-server-txn:2
           imagePullPolicy: Always
 
           volumeMounts:
