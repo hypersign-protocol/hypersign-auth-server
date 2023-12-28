@@ -33,7 +33,7 @@ spec:
             - name: DB_INMEM
               value: "__DB_INMEM__"
             - name: DB_URL
-              value: __DB_URL__
+              value: "__DB_URL__"
             - name: EDV_BASE_URL
               value: "__EDV_BASE_URL__"
             - name: EDV_CONFIG_DIR
@@ -130,7 +130,7 @@ spec:
             - name: DB_INMEM
               value: "__DB_INMEM__"
             - name: DB_URL
-              value: __DB_URL__
+              value: "__DB_URL__"
             - name: EDV_BASE_URL
               value: "__EDV_BASE_URL__"
             - name: EDV_CONFIG_DIR
