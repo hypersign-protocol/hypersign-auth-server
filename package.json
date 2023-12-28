@@ -12,7 +12,7 @@
         "build": "rimraf dist && tsc -p . && cp -r public dist && cp production.env dist",
         "lint": "eslint . --ext .ts",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "bootstrap": "NODE_ENV=production ts-node src/bootstrapHypersignMaterial.ts"
+        "bootstrap": "NODE_ENV=production ts-node src/bootStrapHypersignIssuer.ts"
     },
     "author": "Vishwas Anand Bhushan",
     "license": "MIT",
@@ -27,10 +27,10 @@
         "express-rate-limit": "^5.2.6",
         "express-validator": "^6.12.2",
         "helmet": "^4.4.1",
-        "hid-hd-wallet": "https://github.com/hypersign-protocol/hid-hd-wallet#ssi-integration",
-        "hs-ssi-sdk": "https://github.com/hypersign-protocol/hid-ssi-js-sdk#credential-revocation",
-        "hypersign-auth-node-sdk": "https://github.com/hypersign-protocol/hypersign-auth-node-sdk#registration-on-registry-optional",
-        "hypersign-edv-client": "git+https://github.com/hypersign-protocol/hypersign-edv-client.git#master",
+        "hid-hd-wallet": "github:hypersign-protocol/hid-hd-wallet#ssi-integration",
+        "hs-ssi-sdk": "github:hypersign-protocol/hid-ssi-js-sdk#testcase/bjj",
+        "hypersign-auth-node-sdk": "github:hypersign-protocol/hypersign-auth-node-sdk#update-prajna",
+        "hypersign-edv-client": "github:hypersign-protocol/hypersign-edv-client#develop",
         "ioredis": "^5.2.4",
         "jsonwebtoken": "^9.0.0",
         "mongoose": "^5.12.3",
@@ -55,6 +55,6 @@
         "ts-node": "^10.8.0",
         "typescript": "^4.7.2",
         "webpack": "^5.27.1",
-        "webpack-cli": "^4.5.0"
+        "webpack-cli": "^5.1.4"
     }
 }

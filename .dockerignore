@@ -1,0 +1,13 @@
+node_modules
+*.db
+dist
+*.log
+logs
+.env
+temp
+keys.json
+schema.json
+*.env
+hypersign.json
+
+.authserver-edv-config

@@ -22,7 +22,7 @@ let txnidx = 0
 
 // define runner function
 const runner = async () => {
-    
+	console.log((new Date()) + ': Batch transaction process ')    
         if (sdk === undefined) {
             // init hssdk
             sdk = await hsSdk()
