@@ -5,15 +5,11 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "outDir": "dist",
-    //"sourceMap": true
+    "skipLibCheck": true
   },
-  "files": [
-    "./node_modules/@types/node/index.d.ts"
-  ],
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+
+
+  "files": ["./node_modules/@types/node/index.d.ts"],
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
 }

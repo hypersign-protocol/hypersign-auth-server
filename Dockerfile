@@ -7,4 +7,5 @@ COPY ./hypersign.json .
 RUN npm install
 
 COPY . .
-CMD ["npm", "run","dev"]
+RUN npm run build
+CMD ["npm", "run","start"]

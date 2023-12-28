@@ -1,9 +1,9 @@
-import { HypersignEdvClientEd25519VerificationKey2020 } from 'hypersign-edv-client';
+import { HypersignEdvClientEd25519VerificationKey2020 } from "hypersign-edv-client";
 import {
   IResponse,
   IEncryptionRecipents,
-} from 'hypersign-edv-client/build/Types';
-import { VaultWallet } from './vaultWalletManager';
+} from "hypersign-edv-client/build/Types";
+import { VaultWallet } from "./vaultWalletManager";
 type EDVDocType = {
   document: object;
   documentId?: string;
@@ -26,7 +26,7 @@ export interface IEdvClientManager {
   prepareEdvDocument(
     content: object,
     indexes: Array<{ index: string; unique: boolean }>,
-    recipients?: Array<IEncryptionRecipents>,
+    recipients?: Array<IEncryptionRecipents>
   ): EDVDocType;
   query(equals: { [key: string]: string }): Promise<any>;
 }
@@ -73,7 +73,7 @@ export class EdvClientManger implements IEdvClientManager {
       controller: this.vaultWallet.authenticationKey.id,
       edvId: this.edvId
         ? this.edvId
-        : 'urn:uuid:6e8bc430-9c3a-11d9-9669-0800200c9a66',
+        : "urn:uuid:6e8bc430-9c3a-11d9-9669-0800200c9a66",
     };
 
     const res = await this.vault.registerEdv(config);
@@ -83,9 +83,9 @@ export class EdvClientManger implements IEdvClientManager {
   prepareEdvDocument(
     content: object,
     indexes: Array<{ index: string; unique: boolean }>,
-    recipients?: Array<IEncryptionRecipents>,
+    recipients?: Array<IEncryptionRecipents>
   ): EDVDocType {
-    console.log('edvClientManager:: prepareEdvDocument() ')
+    console.log("edvClientManager:: prepareEdvDocument() ");
     const document: any = {
       document: { content },
       edvId: this.edvId,
@@ -96,12 +96,12 @@ export class EdvClientManger implements IEdvClientManager {
   }
 
   async createDocument(doc: EDVDocType): Promise<{ id: string }> {
-    if (doc['recipients'].length == 0) {
-      doc['recipients'] = this.recipient;
-    } 
+    if (doc["recipients"].length == 0) {
+      doc["recipients"] = this.recipient;
+    }
     const resp: IResponse = await this.vault.insertDoc({ ...doc });
-    if(resp && resp['statusCode'] && resp['statusCode'] === 500){
-      throw new Error(JSON.stringify(resp['message']))
+    if (resp && resp["statusCode"] && resp["statusCode"] === 500) {
+      throw new Error(JSON.stringify(resp["message"]));
     }
     return {
       id: resp?.document.id,
@@ -109,17 +109,20 @@ export class EdvClientManger implements IEdvClientManager {
   }
 
   async updateDocument(doc: EDVDocType, id: string): Promise<{ id: string }> {
-    const resp: IResponse = await this.vault.updateDoc({ ...doc, documentId: id })
-    if(resp && resp['statusCode'] && resp['statusCode'] === 500){
-      throw new Error(JSON.stringify(resp['message']))
+    const resp: IResponse = await this.vault.updateDoc({
+      ...doc,
+      documentId: id,
+    });
+    if (resp && resp["statusCode"] && resp["statusCode"] === 500) {
+      throw new Error(JSON.stringify(resp["message"]));
     }
     return {
-      id: resp.document.id
-    }
+      id: resp.document.id,
+    };
   }
-  
+
   deleteDocument(): any {
-    throw new Error('not implemented');
+    throw new Error("not implemented");
   }
 
   async getDocument(id: string): Promise<IResponse> {
@@ -135,23 +138,23 @@ export class EdvClientManger implements IEdvClientManager {
     if (!doc.document) {
       throw new Error(doc.message);
     }
-      let decryptedObject;
-      decryptedObject = await this.vault.decryptObject({
-        keyAgreementKey: this.vaultWallet.x25519Signer,
-        jwe: doc.document.jwe,
-      });  
+    let decryptedObject;
+    decryptedObject = await this.vault.decryptObject({
+      keyAgreementKey: this.vaultWallet.x25519Signer,
+      jwe: doc.document.jwe,
+    });
 
-    if(!decryptedObject){
-      throw new Error('Unable to decrypt document for id ' + id);
+    if (!decryptedObject) {
+      throw new Error("Unable to decrypt document for id " + id);
     }
-    const { content }  = decryptedObject
+    const { content } = decryptedObject;
     return content;
   }
 
-  async query(equals: { [key: string]: string }): Promise<any>{
+  async query(equals: { [key: string]: string }): Promise<any> {
     const resp = await this.vault.Query({
       edvId: this.edvId,
-      equals
+      equals,
     });
     return resp;
   }
