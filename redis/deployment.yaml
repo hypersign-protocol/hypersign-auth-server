@@ -4,6 +4,8 @@ metadata:
   name: redis-stack
   namespace: hypermine-development
 spec:
+  replicas: 1
+
   selector:
     matchLabels:
       app: redis-stack
