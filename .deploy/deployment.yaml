@@ -57,7 +57,7 @@ spec:
             - name: MAXIMUM_DELAY
               value: "__MAXIMUM_DELAY__"
             - name: MAX_BATCH_SIZE
-              value: __MAX_BATCH_SIZE__
+              value: "__MAX_BATCH_SIZE__"
             - name: MINIMUM_DELAY
               value: "__MINIMUM_DELAY__"
             - name : NODE_ENV
@@ -154,7 +154,7 @@ spec:
             - name: MAXIMUM_DELAY
               value: "__MAXIMUM_DELAY__"
             - name: MAX_BATCH_SIZE
-              value: __MAX_BATCH_SIZE__
+              value: "__MAX_BATCH_SIZE__"
             - name: MINIMUM_DELAY
               value: "__MINIMUM_DELAY__"
             - name : NODE_ENV
@@ -163,7 +163,7 @@ spec:
               value: "__PORT__"
             - name: REDIS_HOST
               value: __REDIS_HOST__
-            - name: "REDIS_PORT"
+            - name: REDIS_PORT
               value: "__REDIS_PORT__"
             - name: SERVICE_END_POINT
               value: __SERVICE_END_POINT__
