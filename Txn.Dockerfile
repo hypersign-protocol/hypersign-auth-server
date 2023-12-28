@@ -5,7 +5,9 @@ COPY ./tsconfig.json .
 RUN npm install
 COPY . .
 RUN npm run build
-CMD [    "npm", "run","service:start"]
+
+CMD cp /data/hypersign.json  hypersign.json  ; npm run service:start;
+
 
 
 
