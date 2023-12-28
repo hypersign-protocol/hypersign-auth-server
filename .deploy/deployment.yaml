@@ -31,7 +31,7 @@ spec:
             - name: DATA_DIR
               value: __DATA_DIR__
             - name: DB_INMEM
-              value: __DB_INMEM__
+              value: "__DB_INMEM__"
             - name: DB_URL
               value: __DB_URL__
             - name: EDV_BASE_URL
@@ -128,7 +128,7 @@ spec:
             - name: DATA_DIR
               value: __DATA_DIR__
             - name: DB_INMEM
-              value: __DB_INMEM__
+              value: "__DB_INMEM__"
             - name: DB_URL
               value: __DB_URL__
             - name: EDV_BASE_URL
