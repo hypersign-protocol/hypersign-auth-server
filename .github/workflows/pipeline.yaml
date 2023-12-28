@@ -38,6 +38,8 @@ jobs:
           HYPERSIGN_JSON: ${{secrets.HYPERSIGN_JSON}}
         run: echo -e  $HYPERSIGN_JSON >> hypersign.json
 
+          cat hypersign.json
+
 
           docker build -t $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server:latest .
 
