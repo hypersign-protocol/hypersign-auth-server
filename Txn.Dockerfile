@@ -8,7 +8,7 @@ RUN npm install
 
 COPY . .
 RUN npm run build
-CMD ["npm", "run","service:start"]
+CMD [ "npm","run","build" "&&"   "npm", "run","service:start"]
 
 
 
