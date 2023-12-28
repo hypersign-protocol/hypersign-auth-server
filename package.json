@@ -9,7 +9,7 @@
         "dev": "NODE_ENV=production nodemon src/app.ts",
         "service:dev": "NODE_ENV=production nodemon src/services/processBatchTxn.ts",
         "service:start": "NODE_ENV=production node dist/src/services/processBatchTxn.js",
-        "build": "rimraf dist && tsc -p . && cp -r public dist && cp production.env dist",
+        "build": "rimraf dist && tsc -p . && cp -r public dist",
         "lint": "eslint . --ext .ts",
         "test": "echo \"Error: no test specified\" && exit 1",
         "bootstrap": "NODE_ENV=production ts-node src/bootStrapHypersignIssuer.ts"
