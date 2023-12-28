@@ -4,6 +4,7 @@ metadata:
   name: auth-server
   namespace: hypermine-development
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: auth-server
