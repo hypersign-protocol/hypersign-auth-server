@@ -16,8 +16,8 @@ spec:
       containers:
         - name: auth-server
           image: __GOOGLE_ARTIFACT_URL__/__GOOGLE_PROJECT_ID__/__GOOGLE_ARTIFACT_REPO__/auth-server:1
-          imagePullPolicy: Always 
-          volumeMounts: 
+          imagePullPolicy: Always
+          volumeMounts:
             - mountPath: "/usr/src/app"
               name: auth-server-hypersign-json
               readOnly: true
@@ -40,7 +40,7 @@ spec:
               value: "__EDV_BASE_URL__"
             - name: EDV_CONFIG_DIR
               value: "__EDV_CONFIG_DIR__"
-            - name:  EDV_DID_FILE_PATH
+            - name: EDV_DID_FILE_PATH
               value: "__EDV_DID_FILE_PATH__"
             - name: EDV_ID
               value: "__EDV_ID__"
@@ -62,9 +62,9 @@ spec:
               value: "__MAX_BATCH_SIZE__"
             - name: MINIMUM_DELAY
               value: "__MINIMUM_DELAY__"
-            - name : NODE_ENV
+            - name: NODE_ENV
               value: __NODE_ENV__
-            - name: PORT 
+            - name: PORT
               value: "__PORT__"
             - name: REDIS_HOST
               value: __REDIS_HOST__
@@ -74,7 +74,7 @@ spec:
               value: __SERVICE_END_POINT__
             - name: WHITELISTED_CORS
               value: '[ "https://dashboard.hypermine.in","wallet-stage.hypersign.id" , "https://whitelist.hypermine.in",  "https://wallet.hypermine.in", "https://ssi.hypermine.in", "http://localhost:4999", "https://hswallet-stage.netlify.app", "https://hyperfyre.netlify.app", "https://wallet-stage.hypersign.id/", "https://hswallet-stage.netlify.app","https://wallet-prajna.hypersign.id"]'
-      volumes: 
+      volumes:
         - name: auth-server-hypersign-json
           secret:
             secretName: auth-server-hypersign-json
@@ -90,7 +90,7 @@ spec:
   selector:
     app: auth-server
   ports:
-  - port: __PORT__
+    - port: __PORT__
       targetPort: __PORT__
       protocol: TCP
 # ---
@@ -113,12 +113,12 @@ spec:
 #         - name: auth-server-txn
 #           image: __GOOGLE_ARTIFACT_URL__/__GOOGLE_PROJECT_ID__/__GOOGLE_ARTIFACT_REPO__/auth-server-txn:latest
 #           imagePullPolicy: Always
-        
-#           volumeMounts: 
+
+#           volumeMounts:
 #             - mountPath: "/usr/src/app"
 #               name: auth-server-hypersign-json
 #               readOnly: true
-          
+
 #           resources:
 #             limits:
 #               memory: "256Mi"
@@ -162,7 +162,7 @@ spec:
 #               value: "__MINIMUM_DELAY__"
 #             - name : NODE_ENV
 #               value: __NODE_ENV__
-#             - name: PORT 
+#             - name: PORT
 #               value: "__PORT__"
 #             - name: REDIS_HOST
 #               value: __REDIS_HOST__
@@ -173,8 +173,7 @@ spec:
 #             - name: WHITELISTED_CORS
 #               value: '[ "https://dashboard.hypermine.in","wallet-stage.hypersign.id" , "https://whitelist.hypermine.in",  "https://wallet.hypermine.in", "https://ssi.hypermine.in", "http://localhost:4999", "https://hswallet-stage.netlify.app", "https://hyperfyre.netlify.app", "https://wallet-stage.hypersign.id/", "https://hswallet-stage.netlify.app","https://wallet-prajna.hypersign.id"]'
 
-
-#       volumes: 
+#       volumes:
 #         - name: auth-server-hypersign-json
 #           secret:
 #             secretName: auth-server-hypersign-json
@@ -193,7 +192,4 @@ spec:
 #   - port: __PORT__
 #       targetPort: __PORT__
 #       protocol: TCP
-
-
-
 
