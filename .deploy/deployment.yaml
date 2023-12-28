@@ -92,106 +92,106 @@ spec:
   - port: __PORT__
       targetPort: __PORT__
       protocol: TCP
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: auth-server-txn
-  namespace: hypermine-development
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: auth-server-txn
+#   namespace: hypermine-development
 
-spec:
-  selector:
-    matchLabels:
-      app: auth-server-txn
-  template:
-    metadata:
-      labels:
-        app: auth-server-txn
-    spec:
-      containers:
-        - name: auth-server-txn
-          image: __GOOGLE_ARTIFACT_URL__/__GOOGLE_PROJECT_ID__/__GOOGLE_ARTIFACT_REPO__/auth-server-txn:latest
-          imagePullPolicy: Always
+# spec:
+#   selector:
+#     matchLabels:
+#       app: auth-server-txn
+#   template:
+#     metadata:
+#       labels:
+#         app: auth-server-txn
+#     spec:
+#       containers:
+#         - name: auth-server-txn
+#           image: __GOOGLE_ARTIFACT_URL__/__GOOGLE_PROJECT_ID__/__GOOGLE_ARTIFACT_REPO__/auth-server-txn:latest
+#           imagePullPolicy: Always
         
-          volumeMounts: 
-            - mountPath: "/usr/src/app"
-              name: auth-server-hypersign-json
-              readOnly: true
+#           volumeMounts: 
+#             - mountPath: "/usr/src/app"
+#               name: auth-server-hypersign-json
+#               readOnly: true
           
-          resources:
-            limits:
-              memory: "1Gi"
-              cpu: "500m"
-          ports:
-            - containerPort: __PORT__
-          env:
-            - name: AUTH0TENANT
-              value: "__AUTH0TENANT__"
-            - name: DATA_DIR
-              value: __DATA_DIR__
-            - name: DB_INMEM
-              value: "__DB_INMEM__"
-            - name: DB_URL
-              value: "__DB_URL__"
-            - name: EDV_BASE_URL
-              value: "__EDV_BASE_URL__"
-            - name: EDV_CONFIG_DIR
-              value: "__EDV_CONFIG_DIR__"
-            - name:  EDV_DID_FILE_PATH
-              value: "__EDV_DID_FILE_PATH__"
-            - name: EDV_ID
-              value: "__EDV_ID__"
-            - name: EDV_KEY_FILE_PATH
-              value: "__EDV_KEY_FILE_PATH__"
-            - name: HIDNODE_REST_URL
-              value: "__HIDNODE_REST_URL__"
-            - name: HIDNODE_RPC_URL
-              value: "__HIDNODE_RPC_URL__"
-            - name: HID_WALLET_MNEMONIC
-              value: "__HID_WALLET_MNEMONIC__"
-            - name: HOST
-              value: "__HOST__"
-            - name: LOG_LEVEL
-              value: __LOG_LEVEL__
-            - name: MAXIMUM_DELAY
-              value: "__MAXIMUM_DELAY__"
-            - name: MAX_BATCH_SIZE
-              value: "__MAX_BATCH_SIZE__"
-            - name: MINIMUM_DELAY
-              value: "__MINIMUM_DELAY__"
-            - name : NODE_ENV
-              value: __NODE_ENV__
-            - name: PORT 
-              value: "__PORT__"
-            - name: REDIS_HOST
-              value: __REDIS_HOST__
-            - name: REDIS_PORT
-              value: "__REDIS_PORT__"
-            - name: SERVICE_END_POINT
-              value: __SERVICE_END_POINT__
-            - name: WHITELISTED_CORS
-              value: '[ "https://dashboard.hypermine.in","wallet-stage.hypersign.id" , "https://whitelist.hypermine.in",  "https://wallet.hypermine.in", "https://ssi.hypermine.in", "http://localhost:4999", "https://hswallet-stage.netlify.app", "https://hyperfyre.netlify.app", "https://wallet-stage.hypersign.id/", "https://hswallet-stage.netlify.app","https://wallet-prajna.hypersign.id"]'
+#           resources:
+#             limits:
+#               memory: "256Mi"
+#               cpu: "500m"
+#           ports:
+#             - containerPort: __PORT__
+#           env:
+#             - name: AUTH0TENANT
+#               value: "__AUTH0TENANT__"
+#             - name: DATA_DIR
+#               value: __DATA_DIR__
+#             - name: DB_INMEM
+#               value: "__DB_INMEM__"
+#             - name: DB_URL
+#               value: "__DB_URL__"
+#             - name: EDV_BASE_URL
+#               value: "__EDV_BASE_URL__"
+#             - name: EDV_CONFIG_DIR
+#               value: "__EDV_CONFIG_DIR__"
+#             - name:  EDV_DID_FILE_PATH
+#               value: "__EDV_DID_FILE_PATH__"
+#             - name: EDV_ID
+#               value: "__EDV_ID__"
+#             - name: EDV_KEY_FILE_PATH
+#               value: "__EDV_KEY_FILE_PATH__"
+#             - name: HIDNODE_REST_URL
+#               value: "__HIDNODE_REST_URL__"
+#             - name: HIDNODE_RPC_URL
+#               value: "__HIDNODE_RPC_URL__"
+#             - name: HID_WALLET_MNEMONIC
+#               value: "__HID_WALLET_MNEMONIC__"
+#             - name: HOST
+#               value: "__HOST__"
+#             - name: LOG_LEVEL
+#               value: __LOG_LEVEL__
+#             - name: MAXIMUM_DELAY
+#               value: "__MAXIMUM_DELAY__"
+#             - name: MAX_BATCH_SIZE
+#               value: "__MAX_BATCH_SIZE__"
+#             - name: MINIMUM_DELAY
+#               value: "__MINIMUM_DELAY__"
+#             - name : NODE_ENV
+#               value: __NODE_ENV__
+#             - name: PORT 
+#               value: "__PORT__"
+#             - name: REDIS_HOST
+#               value: __REDIS_HOST__
+#             - name: REDIS_PORT
+#               value: "__REDIS_PORT__"
+#             - name: SERVICE_END_POINT
+#               value: __SERVICE_END_POINT__
+#             - name: WHITELISTED_CORS
+#               value: '[ "https://dashboard.hypermine.in","wallet-stage.hypersign.id" , "https://whitelist.hypermine.in",  "https://wallet.hypermine.in", "https://ssi.hypermine.in", "http://localhost:4999", "https://hswallet-stage.netlify.app", "https://hyperfyre.netlify.app", "https://wallet-stage.hypersign.id/", "https://hswallet-stage.netlify.app","https://wallet-prajna.hypersign.id"]'
 
 
-      volumes: 
-        - name: auth-server-hypersign-json
-          secret:
-            secretName: auth-server-hypersign-json
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: auth-server-txn-service
-  namespace: hypermine-development
+#       volumes: 
+#         - name: auth-server-hypersign-json
+#           secret:
+#             secretName: auth-server-hypersign-json
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: auth-server-txn-service
+#   namespace: hypermine-development
 
-spec:
-  type: NodePort
-  selector:
-    app: auth-server-txn
-  ports:
-  - port: __PORT__
-      targetPort: __PORT__
-      protocol: TCP
+# spec:
+#   type: NodePort
+#   selector:
+#     app: auth-server-txn
+#   ports:
+#   - port: __PORT__
+#       targetPort: __PORT__
+#       protocol: TCP
 
 
 
