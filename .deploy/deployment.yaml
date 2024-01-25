@@ -23,10 +23,10 @@ spec:
               readOnly: true
           resources:
             limits:
-              memory: "512Gi"
+              memory: "512Mi"
               cpu: "250m"
             requests:
-              memory: "512Gi"
+              memory: "512Mi"
               cpu: "250m"
           ports:
             - containerPort: __PORT__
@@ -126,10 +126,10 @@ spec:
           resources:
             limits:
               memory: "128Mi"
-              cpu: "200m"
+              cpu: "125m"
             requests:
               memory: "128Mi"
-              cpu: "200m"
+              cpu: "125m"
 
           ports:
             - containerPort: __PORT__
