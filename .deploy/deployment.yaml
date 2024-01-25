@@ -25,6 +25,9 @@ spec:
             limits:
               memory: "512Gi"
               cpu: "250m"
+            requests:
+              memory: "512Gi"
+              cpu: "250m"
           ports:
             - containerPort: __PORT__
           env:
@@ -124,6 +127,10 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "200m"
+            requests:
+              memory: "128Mi"
+              cpu: "200m"
+
           ports:
             - containerPort: __PORT__
           env:
