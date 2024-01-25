@@ -23,8 +23,8 @@ spec:
               readOnly: true
           resources:
             limits:
-              memory: "1Gi"
-              cpu: "500m"
+              memory: "512Mi"
+              cpu: "250m"
           ports:
             - containerPort: __PORT__
           env:
