@@ -73,7 +73,7 @@ export = (hypersign, edvClient) => {
     try {
       const { user, document } = req.body;
       const userData: IUserModel = user as IUserModel;
-      userData.nameSpace= user.nameSpace || 'default';
+      userData.nameSpace = user.nameSpace || "default";
 
       let response: IUserModel;
       let status = 201;
@@ -104,8 +104,7 @@ export = (hypersign, edvClient) => {
         const userEdvDoc = {
           encryptedMessage: document.encryptedMessage,
           userId: userData.userId,
-          nameSpace:userData.nameSpace
-
+          nameSpace: userData.nameSpace,
         };
 
         console.log("EncMessage " + userEdvDoc.encryptedMessage);
@@ -116,7 +115,6 @@ export = (hypersign, edvClient) => {
         const edvDocument = edvClient.prepareEdvDocument(userEdvDoc, [
           { index: "content.userId", unique: true },
           { index: "content.nameSpace" },
-
         ]);
         console.log(
           "edvRoutest:: sync(): Before updating the db with docid  " + userDocId
@@ -151,10 +149,15 @@ export = (hypersign, edvClient) => {
     }
   });
 
-  router.get("/sync/:userId", verifyJWT, async (req, res) => {
+  router.get("/sync/:userId/:nameSpace", verifyJWT, async (req, res) => {
     try {
-      const { userId } = req.params;
-      const userDocInEdv = await getUserDocIdIfUserExists(userId, true);
+      const { userId, nameSpace } = req.params;
+
+      const userDocInEdv = await getUserDocIdIfUserExists(
+        userId,
+        nameSpace ? nameSpace : "default",
+        true
+      );
       if (userDocInEdv.success && userDocInEdv.userDocId && userDocInEdv.data) {
         console.log("All good, sending response ");
         return res.status(200).json(userDocInEdv.data);

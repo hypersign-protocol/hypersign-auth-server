@@ -110,12 +110,14 @@ export = (hypersign: IHypersignAuth, edvClient) => {
       userId: user.email,
       sequence: 0,
       docId: "",
+      nameSpace: user.nameSpace || "default",
+    
     } as IUserModel;
 
     console.log(
       "auth:: userExistsMiddleWare() : BEfore checking if user already exists"
     );
-    const userDocInEdv = await getUserDocIdIfUserExists(userData.userId);
+    const userDocInEdv = await getUserDocIdIfUserExists(userData.userId,userData.nameSpace);
 
     console.log(
       "auth:: userExistsMiddleWare() : After checking if user already exists, status " +
