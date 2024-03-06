@@ -73,6 +73,7 @@ export = (hypersign, edvClient) => {
     try {
       const { user, document } = req.body;
       const userData: IUserModel = user as IUserModel;
+      userData.nameSpace= user.nameSpace || 'default';
 
       let response: IUserModel;
       let status = 201;
@@ -103,6 +104,8 @@ export = (hypersign, edvClient) => {
         const userEdvDoc = {
           encryptedMessage: document.encryptedMessage,
           userId: userData.userId,
+          nameSpace:userData.nameSpace
+
         };
 
         console.log("EncMessage " + userEdvDoc.encryptedMessage);
@@ -112,6 +115,8 @@ export = (hypersign, edvClient) => {
         );
         const edvDocument = edvClient.prepareEdvDocument(userEdvDoc, [
           { index: "content.userId", unique: true },
+          { index: "content.nameSpace" },
+
         ]);
         console.log(
           "edvRoutest:: sync(): Before updating the db with docid  " + userDocId
