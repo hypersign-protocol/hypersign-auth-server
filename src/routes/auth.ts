@@ -52,11 +52,12 @@ function addExpirationDateMiddleware(req, res, next) {
 export = (hypersign: IHypersignAuth, edvClient) => {
   const router = Router();
 
-  async function getUserDocIdIfUserExists(userId) {
+  async function getUserDocIdIfUserExists(userId, nameSpace = "default") {
     try {
       console.log("authRoutes:: getUserDocIdIfUserExists(): starts");
       const equals: { [key: string]: string } = {
         ["content.userId"]: userId,
+        ["content.nameSpace"]: nameSpace,
       };
       console.log(
         "authRoutes:: getUserDocIdIfUserExists(): Before quering edvClient for userID " +

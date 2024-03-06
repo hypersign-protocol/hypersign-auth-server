@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-server
+  namespace: hypermine-development
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-server
+  template:
+    metadata:
+      labels:
+        app: auth-server
+    spec:
+      containers:
+        - name: auth-server
+          image: pratapmridha/auth-server
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: "/data"
+              name: auth-server-hypersign-json
+              readOnly: false
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8001
+          env:
+            - name: AUTH0TENANT
+              value: "https://fidato.us.auth0.com/"
+            - name: DATA_DIR
+              value: data
+            - name: DB_INMEM
+              value: "false"
+            - name: DB_URL
+              value: "mongodb+srv://pratap:Pratap%402018@cluster0.xzgmnbz.mongodb.net/authserver?retryWrites=true&w=majority"
+            - name: EDV_BASE_URL
+              value: "https://edv.hypersign.id"
+            - name: EDV_CONFIG_DIR
+              value: ".authserver-edv-config"
+            - name: EDV_DID_FILE_PATH
+              value: ".authserver-edv-config/edv-did.json"
+            - name: EDV_ID
+              value: "urn:uuid:2b9d8b0a-2b9d-4b0a-8b0a-2b9d8b0a2b9:wallet-prajna-edvs"
+            - name: EDV_KEY_FILE_PATH
+              value: ".authserver-edv-config/edv-key.json"
+            - name: HIDNODE_REST_URL
+              value: "https://api.prajna.hypersign.id/"
+            - name: HIDNODE_RPC_URL
+              value: "https://rpc.prajna.hypersign.id/"
+            - name: HID_WALLET_MNEMONIC
+              value: "sword comic lunar chalk runway evolve brand jungle glare opera submit promote defense unveil require yellow night hidden pupil setup fringe avocado ginger champion"
+            - name: HOST
+              value: "127.0.0.1"
+            - name: LOG_LEVEL
+              value: debug
+            - name: MAXIMUM_DELAY
+              value: "60000"
+            - name: MAX_BATCH_SIZE
+              value: "500"
+            - name: MINIMUM_DELAY
+              value: "5000"
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: "8001"
+            - name: REDIS_HOST
+              value: redis-stack-service.hypermine-development.svc.cluster.local
+            - name: REDIS_PORT
+              value: "6379"
+            - name: SERVICE_END_POINT
+              value: "https://authserver.hypersign.id/"
+            - name: WHITELISTED_CORS
+              value: '[ "https://dashboard.hypermine.in","wallet-stage.hypersign.id" , "https://whitelist.hypermine.in",  "https://wallet.hypermine.in", "https://ssi.hypermine.in", "http://localhost:4999", "https://hswallet-stage.netlify.app", "https://hyperfyre.netlify.app", "https://wallet-stage.hypersign.id/", "https://hswallet-stage.netlify.app","https://wallet-prajna.hypersign.id"]'
+      volumes:
+        - name: auth-server-hypersign-json
+          secret:
+            secretName: auth-server-hypersign-json
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-server-service
+  namespace: hypermine-development
+
+spec:
+  type: NodePort
+  selector:
+    app: auth-server
+  ports:
+    - port: 8001
+      targetPort: 8001
+      protocol: TCP

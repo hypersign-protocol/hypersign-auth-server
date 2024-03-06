@@ -9,14 +9,20 @@ export = (hypersign, edvClient) => {
       userId: userData.userId,
       sequence: 0,
       docId: docId,
+      nameSpace: userData.nameSpace ? "default" : userData.nameSpace,
     } as IUserModel;
   }
 
-  async function getUserDocIdIfUserExists(userId, getRawData: boolean = false) {
+  async function getUserDocIdIfUserExists(
+    userId,
+    nameSpace,
+    getRawData: boolean = false
+  ) {
     try {
       let data = null;
       const equals: { [key: string]: string } = {
         ["content.userId"]: userId,
+        ["content.nameSpace"]: nameSpace,
       };
       const userDataInEdv: Array<any> = await edvClient.query(equals);
       if (!Array.isArray(userDataInEdv)) {
@@ -76,11 +82,17 @@ export = (hypersign, edvClient) => {
       );
       const equals: { [key: string]: string } = {
         ["content.userId"]: userData.userId,
+        ["content.nameSpace"]: userData.nameSpace
+          ? "default"
+          : userData.nameSpace,
       };
       const userDataInEdv: Array<any> = await edvClient.query(equals);
       console.log("User data in edv " + JSON.stringify(userDataInEdv));
 
-      const userDocInEdv = await getUserDocIdIfUserExists(userData.userId);
+      const userDocInEdv = await getUserDocIdIfUserExists(
+        userData.userId,
+        userData.nameSpace
+      );
       const { userDocId } = userDocInEdv;
       console.log(
         "edvRoutest:: sync(): After checking if user exists with doc id " +
