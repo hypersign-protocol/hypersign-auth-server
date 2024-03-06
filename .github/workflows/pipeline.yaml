@@ -43,13 +43,13 @@ jobs:
           GOOGLE_ARTIFACT_REPO: ${{secrets.GOOGLE_ARTIFACT_REPO}}
           HYPERSIGN_JSON: ${{secrets.HYPERSIGN_JSON}}
         run:
-          docker build -t $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server:v5.4.0-rc.3 .
+          docker build -t $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server:v5.4.0-rc.4 .
 
-          docker push  $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server:v5.4.0-rc.3
+          docker push  $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server:v5.4.0-rc.4
 
-          docker build -t $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server-txn:v5.4.0-rc.3  . -f Txn.Dockerfile
+          docker build -t $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server-txn:v5.4.0-rc.4  . -f Txn.Dockerfile
 
-          docker push $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server-txn:v5.4.0-rc.3
+          docker push $GOOGLE_ARTIFACT_URL/$GOOGLE_PROJECT_ID/$GOOGLE_ARTIFACT_REPO/auth-server-txn:v5.4.0-rc.4
 
   Deploy-Pipeline:
     needs: [Build-Pipeline]
@@ -76,7 +76,7 @@ jobs:
       - name: "Configure kubectl"
         run: gcloud container clusters get-credentials hypermine-gke --region=asia-south1
       - name: Replace tags
-        run: find .deploy/deployment.yaml -type f -exec sed  -i -e "s#__LATEST_RELEASE_TAG__#v5.4.0-rc.3#" {} \;
+        run: find .deploy/deployment.yaml -type f -exec sed  -i -e "s#__LATEST_RELEASE_TAG__#v5.4.0-rc.4#" {} \;
 
       - name: "Replace secrets"
         run: find .deploy/deployment.yaml -type f -exec sed  -i ''s/__GOOGLE_ARTIFACT_URL__/${{ secrets.GOOGLE_ARTIFACT_URL }}/g'' {} \;

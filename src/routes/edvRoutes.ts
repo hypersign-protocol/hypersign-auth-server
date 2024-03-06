@@ -73,7 +73,7 @@ export = (hypersign, edvClient) => {
     try {
       const { user, document } = req.body;
       const userData: IUserModel = user as IUserModel;
-      userData.nameSpace = user.nameSpace || "default";
+      userData.nameSpace = user.nameSpace ? user.nameSpace : "default";
 
       let response: IUserModel;
       let status = 201;

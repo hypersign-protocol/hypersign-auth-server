@@ -110,7 +110,7 @@ export = (hypersign: IHypersignAuth, edvClient) => {
       userId: user.email,
       sequence: 0,
       docId: "",
-      nameSpace: user.nameSpace || "default",
+      nameSpace: user.nameSpace?user.nameSpace: "default",
     
     } as IUserModel;
 
