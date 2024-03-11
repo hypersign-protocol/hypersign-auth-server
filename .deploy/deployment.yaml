@@ -76,7 +76,7 @@ spec:
             - name: SERVICE_END_POINT
               value: __SERVICE_END_POINT__
             - name: WHITELISTED_CORS
-              value: '[ "https://dashboard.hypermine.in","wallet-stage.hypersign.id" , "https://whitelist.hypermine.in",  "https://wallet.hypermine.in", "https://ssi.hypermine.in", "http://localhost:4999", "https://hswallet-stage.netlify.app", "https://hyperfyre.netlify.app", "https://wallet-stage.hypersign.id/", "https://hswallet-stage.netlify.app","https://wallet-prajna.hypersign.id"]'
+              value: '[ "https://dashboard.hypermine.in","wallet-stage.hypersign.id" , "https://whitelist.hypermine.in",  "https://wallet.hypermine.in", "https://ssi.hypermine.in", "http://localhost:4999", "https://hswallet-stage.netlify.app", "https://hyperfyre.netlify.app", "https://wallet-stage.hypersign.id/", "https://hswallet-stage.netlify.app","https://wallet-prajna.hypersign.id","https://hypersign-kyc-widget.netlify.app"]'
       volumes:
         - name: auth-server-hypersign-json
           secret:
