@@ -22,12 +22,12 @@
         "express-rate-limit": "^5.2.6",
         "express-validator": "^6.12.2",
         "helmet": "^4.4.1",
-        "hs-ssi-sdk": "^5.0.1",
+        "hs-ssi-sdk": "^7.0.1",
         "hypersign-auth-js-sdk": "^2.0.4",
-        "mongoose": "^5.12.3",
+        "mongoose": "^5.12.4",
         "swagger-ui-express": "^4.1.6",
         "uuid": "^8.3.2",
-        "winston": "^3.3.3",
+        "winston": "^3.3.4",
         "xss-clean": "^0.1.1"
     },
     "devDependencies": {
